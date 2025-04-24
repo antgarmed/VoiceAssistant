@@ -1,8 +1,8 @@
 # Local Voice Assistant
 
-This project provides a high-performance, local-first voice assistant featuring real-time transcription, LLM reasoning, text-to-speech, and a desktop GUI built with Tauri and React. This project runs entirely on your local machine (after initial model downloads) for privacy and speed, leveraging GPU acceleration.
+This project provides a high-performance, local voice assistant featuring real-time transcription, LLM reasoning, text-to-speech, and a desktop GUI built with Tauri and React. It runs entirely on your machine (after model downloads) for privacy and speed, with GPU acceleration. It features the new Sesame CSM model for expressive, state-of-the-art local speech synthesis.
 
-## Key Features
+## Features
 
 *   **Real-time Speech-to-Text (ASR):** Fast transcription using `faster-whisper`.
 *   **Local Language Model (LLM):** On-device response generation using a quantized Llama 3.2 1B model via `llama-cpp-python`.
@@ -16,11 +16,11 @@ This project provides a high-performance, local-first voice assistant featuring 
 
 ## Tech Stack
 
-*   **Frontend GUI:** Tauri (v1), React (v18+), TypeScript, Zustand, Vite, **npm**
+*   **Frontend GUI:** Tauri (v1), React (v18+), TypeScript, Zustand, Vite, npm - need to update these
 *   **Backend Framework:** Python (3.10), FastAPI, Uvicorn
 *   **ASR Model:** `faster-whisper` (Default: `large-v3`, configurable in `shared/config.yaml`)
 *   **LLM Model:** `llama-cpp-python`, Llama 3.2 1B GGUF (Default: `bartowski/Llama-3.2-1B-Instruct-GGUF`, `Q4_K_M` quantization, configurable in `shared/config.yaml`)
-*   **TTS Model:** `senstella/csm-expressiva-1b` (Sesame CSM fine-tune), uses `speaker_id=4`, Mimi/Encodec audio tokenizer.
+*   **TTS Model:** `senstella/csm-expressiva-1b` (Sesame CSM fine-tune), Mimi/Encodec audio tokenizer.
 *   **Containerization:** Docker, Docker Compose
 *   **Model Management:** Hugging Face Hub (`huggingface_hub`)
 
