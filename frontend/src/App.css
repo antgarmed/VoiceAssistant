@@ -1,0 +1,17 @@
+/* frontend/src/App.css */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Fill viewport height */
+  padding: 1rem;
+  box-sizing: border-box; /* Include padding */
+}
+
+.app-container h1 {
+  font-size: 1.8em;
+  margin-bottom: 1.5rem;
+  color: #e0e0e0; /* Slightly lighter heading */
+  text-align: center; /* Center heading */
+}
+
+/* Global error message style defined in index.css */

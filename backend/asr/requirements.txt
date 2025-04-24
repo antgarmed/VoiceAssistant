@@ -1,0 +1,27 @@
+# backend/asr/requirements.txt
+fastapi>=0.110.0,<0.112.0
+uvicorn[standard]>=0.29.0,<0.30.0
+python-dotenv>=1.0.0
+PyYAML>=6.0
+pydantic>=2.0.0,<3.0.0
+
+# ASR Core & Dependencies
+faster-whisper>=1.0.1,<1.1.0
+# Specify torch version compatible with TTS dependency (CSM requires 2.4.0)
+torch==2.4.0 --extra-index-url https://download.pytorch.org/whl/cu121
+torchaudio==2.4.0 --extra-index-url https://download.pytorch.org/whl/cu121
+ctranslate2>=4.0.0,<4.4.0
+
+# Audio Handling
+soundfile>=0.12.1
+numpy>=1.24.0,<2.0.0
+pydub>=0.25.0
+
+# Model Downloading & Cache Management - Allow newer version required by transformers 4.49.0
+huggingface_hub>=0.20.0,<1.0
+
+# Health checks / internal comms (optional)
+httpx>=0.27.0
+
+# Match TTS requirement for consistency (indirect dependencies)
+transformers==4.49.0

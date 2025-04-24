@@ -1,0 +1,91 @@
+/* frontend/src/index.css (or style.css) */
+:root {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+  
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #242424;
+  
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  
+    --primary-color: #61dafb; /* React Blue */
+    --secondary-color: #21a1c4;
+    --background-light: #ffffff;
+    --background-dark: #242424; /* Keep dark background */
+    --text-light: #213547;
+    --text-dark: rgba(255, 255, 255, 0.87);
+    --error-color: #ff6b6b;
+    --thinking-color: #f0d5a0;
+    --speaking-color: #87cefa;
+    --listening-color: #90ee90;
+  }
+  
+  body {
+    margin: 0;
+    display: flex;
+    place-items: center;
+    min-width: 320px;
+    min-height: 100vh;
+    background-color: var(--background-dark);
+    color: var(--text-dark);
+  }
+  
+  #root { /* Changed from #app to #root */
+    max-width: 1280px;
+    width: 100%;
+    height: 100vh; /* Ensure app fills viewport height */
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  button {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    transition: border-color 0.25s;
+    color: inherit; /* Inherit text color */
+  }
+  button:hover {
+    border-color: var(--primary-color);
+  }
+  button:focus,
+  button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
+  
+  .error-message {
+      color: var(--error-color);
+      margin-top: 1rem;
+      font-size: 0.9em;
+      min-height: 1.2em; /* Reserve space */
+  }
+  
+  @media (prefers-color-scheme: light) {
+    :root {
+      color: var(--text-light);
+      background-color: var(--background-light);
+       /* Adjust React blue for light mode if desired */
+      --primary-color: #0a7ea4;
+      --secondary-color: #075c7a;
+    }
+    button {
+      background-color: #f9f9f9;
+      color: var(--text-light); /* Ensure button text readable */
+    }
+    body {
+       background-color: var(--background-light);
+       color: var(--text-light);
+    }
+  }

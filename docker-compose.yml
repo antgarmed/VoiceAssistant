@@ -1,0 +1,172 @@
+# voice-assistant/docker-compose.yml
+# Corrected depends_on and removed sleep from tts
+
+services:
+  asr:
+    build:
+      context: ./backend/asr
+      dockerfile: Dockerfile
+    container_name: voice-assistant-asr
+    ports:
+      - "${ASR_PORT}:${ASR_PORT}"
+    volumes:
+      - ./shared/config.yaml:/app/config.yaml:ro
+      - ./shared/logs:/app/logs
+      - model_cache:${CACHE_DIR:-/cache}
+    environment:
+      - ASR_PORT=${ASR_PORT}
+      - CACHE_DIR=${CACHE_DIR:-/cache}
+      - USE_GPU=${USE_GPU}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
+      - CONFIG_PATH=/app/config.yaml
+      - LOG_FILE_BASE=/app/logs/service
+      - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN}
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: 1
+    runtime: nvidia
+    networks:
+      - voice-assistant-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:${ASR_PORT}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  llm:
+    build:
+      context: ./backend/llm
+      dockerfile: Dockerfile
+    container_name: voice-assistant-llm
+    ports:
+      - "${LLM_PORT}:${LLM_PORT}"
+    volumes:
+      - ./shared/config.yaml:/app/config.yaml:ro
+      - ./shared/logs:/app/logs
+      - model_cache:${CACHE_DIR:-/cache}
+    environment:
+      - LLM_PORT=${LLM_PORT}
+      - CACHE_DIR=${CACHE_DIR:-/cache}
+      - USE_GPU=${USE_GPU}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
+      - CONFIG_PATH=/app/config.yaml
+      - LOG_FILE_BASE=/app/logs/service
+      - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN}
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - CMAKE_ARGS=${CMAKE_ARGS:--DLLAMA_CUBLAS=on}
+      - FORCE_CMAKE=${FORCE_CMAKE:-1}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: 1
+    runtime: nvidia
+    networks:
+      - voice-assistant-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:${LLM_PORT}/health"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 180s
+
+  tts:
+    build:
+      context: ./backend/tts
+      dockerfile: Dockerfile
+    container_name: voice-assistant-tts
+    # REMOVED 'command: ["sleep", "infinity"]' - It will now run the app.py CMD/ENTRYPOINT
+    ports:
+      - "${TTS_PORT}:${TTS_PORT}"
+    volumes:
+      - ./shared/config.yaml:/app/config.yaml:ro
+      - ./shared/logs:/app/logs
+      - model_cache:${CACHE_DIR:-/cache}
+    environment:
+      - TTS_PORT=${TTS_PORT}
+      - CACHE_DIR=${CACHE_DIR:-/cache}
+      - USE_GPU=${USE_GPU} # Should be true or auto for CSM
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
+      - CONFIG_PATH=/app/config.yaml
+      - LOG_FILE_BASE=/app/logs/service
+      - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN} # REQUIRED
+      - NO_TORCH_COMPILE=${NO_TORCH_COMPILE:-1} # Important for CSM's Mimi dependency
+      - TTS_SPEAKER_ID=${TTS_SPEAKER_ID:-4}     # Default to 4 for expressiva model
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: 1 # CSM requires GPU
+    runtime: nvidia
+    networks:
+      - voice-assistant-net
+    restart: unless-stopped
+    healthcheck: # Healthcheck should now work if app starts correctly
+      test: ["CMD", "curl", "--fail", "http://localhost:${TTS_PORT}/health"]
+      interval: 30s
+      timeout: 20s
+      retries: 5
+      start_period: 300s # Keep long start period, CSM loading is slow
+
+  orchestrator:
+    build:
+      context: ./backend/orchestrator
+      dockerfile: Dockerfile
+    container_name: voice-assistant-orchestrator
+    ports:
+      - "${ORCHESTRATOR_PORT}:${ORCHESTRATOR_PORT}"
+    volumes:
+      - ./shared/config.yaml:/app/config.yaml:ro
+      - ./shared/logs:/app/logs
+    environment:
+      - ORCHESTRATOR_PORT=${ORCHESTRATOR_PORT}
+      - ASR_SERVICE_URL=http://asr:${ASR_PORT}
+      - LLM_SERVICE_URL=http://llm:${LLM_PORT}
+      - TTS_SERVICE_URL=http://tts:${TTS_PORT} # Base HTTP URL for TTS service
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
+      - CONFIG_PATH=/app/config.yaml
+      - LOG_FILE_BASE=/app/logs/service
+    depends_on:
+      asr:
+        condition: service_healthy
+      llm:
+        condition: service_healthy
+      tts: # CORRECTED DEPENDENCY FORMAT
+        condition: service_healthy # Restore the healthcheck dependency
+    networks:
+      - voice-assistant-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:${ORCHESTRATOR_PORT}/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s # Orchestrator starts quickly once dependencies are met
+
+networks:
+  voice-assistant-net:
+    driver: bridge
+
+volumes:
+  model_cache: # Unified cache for all downloaded models
+    driver: local

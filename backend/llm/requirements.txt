@@ -1,0 +1,15 @@
+# backend/llm/requirements.txt
+fastapi>=0.110.0,<0.112.0
+uvicorn[standard]>=0.29.0,<0.30.0
+python-dotenv>=1.0.0
+PyYAML>=6.0
+pydantic>=2.0.0,<3.0.0
+
+# LLM Core - llama-cpp-python
+llama-cpp-python[server]>=0.2.75,<0.3.0
+
+# Model Downloading & Cache Management - Allow newer version needed for consistency
+huggingface_hub>=0.20.0,<1.0
+
+# Health checks / internal comms (optional)
+httpx>=0.27.0

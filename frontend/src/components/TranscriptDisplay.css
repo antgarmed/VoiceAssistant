@@ -1,0 +1,59 @@
+/* frontend/src/components/TranscriptDisplay.css */
+.transcript-container {
+    flex-grow: 1; /* Allow container to take available space */
+    overflow-y: auto; /* Enable scrolling */
+    padding: 1rem;
+    border: 1px solid #444;
+    border-radius: 8px;
+    margin-bottom: 1rem; /* Space before controls */
+    min-height: 150px;
+    text-align: left;
+    background-color: rgba(0, 0, 0, 0.1);
+    display: flex; /* Needed for placeholder centering */
+    flex-direction: column; /* Stack messages or show placeholder */
+  }
+ 
+  .conversation-log {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    /* Make log take available space if container uses flex */
+    flex-grow: 1;
+    justify-content: flex-end; /* Push content to bottom (optional) */
+  }
+ 
+  .message {
+    padding: 0.5rem 0.8rem;
+    border-radius: 6px;
+    max-width: 90%;
+    word-wrap: break-word;
+  }
+ 
+  .user-message {
+    background-color: #3a3a3a;
+    align-self: flex-end;
+    margin-left: auto;
+  }
+ 
+  .assistant-message {
+    background-color: #2a2a4a;
+    align-self: flex-start;
+    margin-right: auto;
+  }
+ 
+  .message strong {
+     display: block;
+     margin-bottom: 0.2em;
+     font-size: 0.8em;
+     opacity: 0.8;
+  }
+ 
+  .placeholder {
+    color: #888;
+    font-style: italic;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    flex-grow: 1; /* Take full height */
+    min-height: 100px;
+  }

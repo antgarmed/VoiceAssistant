@@ -1,0 +1,580 @@
+2025-04-20 11:04:03,573 - asr:173 - INFO - ASR Service starting up...
+2025-04-20 11:04:03,573 - asr:65 - INFO - Loading configuration from: /app/config.yaml
+2025-04-20 11:04:03,615 - asr:80 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-20 11:04:03,616 - asr:81 - INFO - USE_GPU environment variable: 'auto'
+2025-04-20 11:04:03,616 - asr:82 - INFO - Configured ASR device: 'auto'
+2025-04-20 11:04:03,616 - asr:92 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-20 11:04:03,616 - asr:100 - INFO - ASR effective device set to: cuda
+2025-04-20 11:04:03,617 - asr:125 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-20 11:04:03,617 - asr:126 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-20 11:04:03,617 - asr:127 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-20 11:04:03,617 - asr:134 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-20 11:04:04,065 - huggingface_hub.file_download:1670 - WARNING - Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2025-04-20 11:04:59,141 - asr:150 - INFO - ASR Model 'large-v3' loaded successfully in 55.53 seconds.
+2025-04-20 11:04:59,142 - huggingface_hub._login:146 - WARNING - Not logged in!
+2025-04-20 11:04:59,142 - asr:164 - INFO - Logged out from Hugging Face Hub.
+2025-04-20 11:24:22,568 - asr:173 - INFO - ASR Service starting up...
+2025-04-20 11:24:22,569 - asr:65 - INFO - Loading configuration from: /app/config.yaml
+2025-04-20 11:24:22,596 - asr:80 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-20 11:24:22,596 - asr:81 - INFO - USE_GPU environment variable: 'auto'
+2025-04-20 11:24:22,597 - asr:82 - INFO - Configured ASR device: 'auto'
+2025-04-20 11:24:22,597 - asr:92 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-20 11:24:22,597 - asr:100 - INFO - ASR effective device set to: cuda
+2025-04-20 11:24:22,597 - asr:125 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-20 11:24:22,597 - asr:126 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-20 11:24:22,597 - asr:127 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-20 11:24:22,597 - asr:134 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-20 11:24:26,603 - asr:150 - INFO - ASR Model 'large-v3' loaded successfully in 4.01 seconds.
+2025-04-20 11:24:26,604 - asr:166 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-20 12:01:16,514 - asr:173 - INFO - ASR Service starting up...
+2025-04-20 12:01:16,515 - asr:65 - INFO - Loading configuration from: /app/config.yaml
+2025-04-20 12:01:16,668 - asr:80 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-20 12:01:16,668 - asr:81 - INFO - USE_GPU environment variable: 'auto'
+2025-04-20 12:01:16,668 - asr:82 - INFO - Configured ASR device: 'auto'
+2025-04-20 12:01:16,668 - asr:92 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-20 12:01:16,669 - asr:100 - INFO - ASR effective device set to: cuda
+2025-04-20 12:01:16,669 - asr:125 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-20 12:01:16,669 - asr:126 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-20 12:01:16,669 - asr:127 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-20 12:01:16,669 - asr:134 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-20 12:01:17,076 - huggingface_hub.file_download:1670 - WARNING - Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2025-04-20 12:02:12,992 - asr:150 - INFO - ASR Model 'large-v3' loaded successfully in 56.32 seconds.
+2025-04-20 12:02:12,992 - huggingface_hub._login:146 - WARNING - Not logged in!
+2025-04-20 12:02:12,992 - asr:164 - INFO - Logged out from Hugging Face Hub.
+2025-04-20 12:32:14,836 - asr:173 - INFO - ASR Service starting up...
+2025-04-20 12:32:14,837 - asr:65 - INFO - Loading configuration from: /app/config.yaml
+2025-04-20 12:32:15,026 - asr:80 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-20 12:32:15,026 - asr:81 - INFO - USE_GPU environment variable: 'auto'
+2025-04-20 12:32:15,027 - asr:82 - INFO - Configured ASR device: 'auto'
+2025-04-20 12:32:15,027 - asr:92 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-20 12:32:15,027 - asr:100 - INFO - ASR effective device set to: cuda
+2025-04-20 12:32:15,027 - asr:125 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-20 12:32:15,027 - asr:126 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-20 12:32:15,027 - asr:127 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-20 12:32:15,028 - asr:134 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-20 12:32:15,562 - huggingface_hub.file_download:1670 - WARNING - Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2025-04-20 12:33:16,644 - asr:150 - INFO - ASR Model 'large-v3' loaded successfully in 61.62 seconds.
+2025-04-20 12:33:16,645 - huggingface_hub._login:146 - WARNING - Not logged in!
+2025-04-20 12:33:16,645 - asr:164 - INFO - Logged out from Hugging Face Hub.
+2025-04-21 06:16:08,896 - asr:173 - INFO - ASR Service starting up...
+2025-04-21 06:16:08,897 - asr:65 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 06:16:08,927 - asr:80 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-21 06:16:08,928 - asr:81 - INFO - USE_GPU environment variable: 'auto'
+2025-04-21 06:16:08,928 - asr:82 - INFO - Configured ASR device: 'auto'
+2025-04-21 06:16:08,928 - asr:92 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-21 06:16:08,928 - asr:100 - INFO - ASR effective device set to: cuda
+2025-04-21 06:16:08,928 - asr:125 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-21 06:16:08,928 - asr:126 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-21 06:16:08,928 - asr:127 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-21 06:16:08,929 - asr:134 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-21 06:16:12,951 - asr:150 - INFO - ASR Model 'large-v3' loaded successfully in 4.02 seconds.
+2025-04-21 06:16:12,952 - asr:166 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-21 06:43:40,424 - asr:173 - INFO - ASR Service starting up...
+2025-04-21 06:43:40,425 - asr:65 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 06:43:40,458 - asr:80 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-21 06:43:40,458 - asr:81 - INFO - USE_GPU environment variable: 'auto'
+2025-04-21 06:43:40,458 - asr:82 - INFO - Configured ASR device: 'auto'
+2025-04-21 06:43:40,458 - asr:92 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-21 06:43:40,458 - asr:100 - INFO - ASR effective device set to: cuda
+2025-04-21 06:43:40,459 - asr:125 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-21 06:43:40,459 - asr:126 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-21 06:43:40,459 - asr:127 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-21 06:43:40,459 - asr:134 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-21 06:43:44,297 - asr:150 - INFO - ASR Model 'large-v3' loaded successfully in 3.84 seconds.
+2025-04-21 06:43:44,298 - asr:166 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-21 07:26:35,816 - asr:173 - INFO - ASR Service starting up...
+2025-04-21 07:26:35,816 - asr:65 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 07:26:35,847 - asr:80 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-21 07:26:35,847 - asr:81 - INFO - USE_GPU environment variable: 'auto'
+2025-04-21 07:26:35,848 - asr:82 - INFO - Configured ASR device: 'auto'
+2025-04-21 07:26:35,848 - asr:92 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-21 07:26:35,848 - asr:100 - INFO - ASR effective device set to: cuda
+2025-04-21 07:26:35,848 - asr:125 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-21 07:26:35,848 - asr:126 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-21 07:26:35,848 - asr:127 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-21 07:26:35,848 - asr:134 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-21 07:26:40,350 - asr:150 - INFO - ASR Model 'large-v3' loaded successfully in 4.50 seconds.
+2025-04-21 07:26:40,352 - asr:166 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-21 08:08:21,738 - asr:173 - INFO - ASR Service starting up...
+2025-04-21 08:08:21,739 - asr:65 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 08:08:21,917 - asr:80 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-21 08:08:21,918 - asr:81 - INFO - USE_GPU environment variable: 'auto'
+2025-04-21 08:08:21,918 - asr:82 - INFO - Configured ASR device: 'auto'
+2025-04-21 08:08:21,918 - asr:92 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-21 08:08:21,918 - asr:100 - INFO - ASR effective device set to: cuda
+2025-04-21 08:08:21,918 - asr:125 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-21 08:08:21,919 - asr:126 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-21 08:08:21,919 - asr:127 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-21 08:08:21,919 - asr:134 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-21 08:08:22,052 - asr:153 - CRITICAL - FATAL: Failed to load or download ASR model 'large-v3': Invalid user token.
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 409, in hf_raise_for_status
+    response.raise_for_status()
+  File "/app/.venv/lib/python3.10/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: https://huggingface.co/api/whoami-v2
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.10/site-packages/huggingface_hub/hf_api.py", line 1737, in whoami
+    hf_raise_for_status(r)
+  File "/app/.venv/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 482, in hf_raise_for_status
+    raise _format(HfHubHTTPError, str(e), response) from e
+huggingface_hub.errors.HfHubHTTPError: 401 Client Error: Unauthorized for url: https://huggingface.co/api/whoami-v2 (Request ID: Root=1-6805fcf1-4054adb245a8b9b72f268a40;7ab86ca8-29d5-44f3-9e6d-77d94a937263)
+
+Invalid credentials in Authorization header
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app.py", line 136, in load_asr_model
+    login(token=HF_TOKEN)
+  File "/app/.venv/lib/python3.10/site-packages/huggingface_hub/utils/_deprecation.py", line 101, in inner_f
+    return f(*args, **kwargs)
+  File "/app/.venv/lib/python3.10/site-packages/huggingface_hub/utils/_deprecation.py", line 31, in inner_f
+    return f(*args, **kwargs)
+  File "/app/.venv/lib/python3.10/site-packages/huggingface_hub/_login.py", line 126, in login
+    _login(token, add_to_git_credential=add_to_git_credential)
+  File "/app/.venv/lib/python3.10/site-packages/huggingface_hub/_login.py", line 404, in _login
+    token_info = whoami(token)
+  File "/app/.venv/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/app/.venv/lib/python3.10/site-packages/huggingface_hub/hf_api.py", line 1750, in whoami
+    raise HTTPError(error_message, request=e.request, response=e.response) from e
+requests.exceptions.HTTPError: Invalid user token.
+2025-04-21 08:08:22,056 - huggingface_hub._login:146 - WARNING - Not logged in!
+2025-04-21 08:08:22,056 - asr:164 - INFO - Logged out from Hugging Face Hub.
+2025-04-21 08:08:22,056 - asr:181 - CRITICAL - Lifespan startup failed due to model load error: ASR model loading failed: Invalid user token.
+2025-04-21 08:25:32,626 - asr:173 - INFO - ASR Service starting up...
+2025-04-21 08:25:32,626 - asr:65 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 08:25:32,656 - asr:80 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-21 08:25:32,656 - asr:81 - INFO - USE_GPU environment variable: 'auto'
+2025-04-21 08:25:32,656 - asr:82 - INFO - Configured ASR device: 'auto'
+2025-04-21 08:25:32,656 - asr:92 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-21 08:25:32,656 - asr:100 - INFO - ASR effective device set to: cuda
+2025-04-21 08:25:32,657 - asr:125 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-21 08:25:32,657 - asr:126 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-21 08:25:32,657 - asr:127 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-21 08:25:32,657 - asr:134 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-21 08:25:36,655 - asr:150 - INFO - ASR Model 'large-v3' loaded successfully in 4.00 seconds.
+2025-04-21 08:25:36,657 - asr:166 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-23 06:12:35,150 - asr:273 - INFO - Received transcription request for file: recording-1745388755024.wav (audio/webm;codecs=opus)
+2025-04-23 06:12:35,176 - asr:256 - ERROR - Soundfile error processing audio 'recording-1745388755024.wav': Error opening <_io.BytesIO object at 0x7fa44b7ec720>: Format not recognised.
+Traceback (most recent call last):
+  File "/app/app.py", line 215, in preprocess_audio
+    audio_data, samplerate = sf.read(audio_stream, dtype='float32', always_2d=True)
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 305, in read
+    with SoundFile(file, 'r', samplerate, channels,
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 690, in __init__
+    self._file = self._open(file, mode_int, closefd)
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 1265, in _open
+    raise LibsndfileError(err, prefix="Error opening {0!r}: ".format(self.name))
+soundfile.LibsndfileError: Error opening <_io.BytesIO object at 0x7fa44b7ec720>: Format not recognised.
+2025-04-23 06:12:35,206 - asr:339 - WARNING - HTTP exception during transcription: 400 - Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7fa44b7ec720>: Format not recognised.
+2025-04-23 06:12:38,061 - asr:273 - INFO - Received transcription request for file: recording-1745388758010.wav (audio/webm;codecs=opus)
+2025-04-23 06:12:38,062 - asr:256 - ERROR - Soundfile error processing audio 'recording-1745388758010.wav': Error opening <_io.BytesIO object at 0x7fa431e47c40>: Format not recognised.
+Traceback (most recent call last):
+  File "/app/app.py", line 215, in preprocess_audio
+    audio_data, samplerate = sf.read(audio_stream, dtype='float32', always_2d=True)
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 305, in read
+    with SoundFile(file, 'r', samplerate, channels,
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 690, in __init__
+    self._file = self._open(file, mode_int, closefd)
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 1265, in _open
+    raise LibsndfileError(err, prefix="Error opening {0!r}: ".format(self.name))
+soundfile.LibsndfileError: Error opening <_io.BytesIO object at 0x7fa431e47c40>: Format not recognised.
+2025-04-23 06:12:38,062 - asr:339 - WARNING - HTTP exception during transcription: 400 - Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7fa431e47c40>: Format not recognised.
+2025-04-23 06:12:40,141 - asr:273 - INFO - Received transcription request for file: recording-1745388760089.wav (audio/webm;codecs=opus)
+2025-04-23 06:12:40,142 - asr:256 - ERROR - Soundfile error processing audio 'recording-1745388760089.wav': Error opening <_io.BytesIO object at 0x7fa431e47ec0>: Format not recognised.
+Traceback (most recent call last):
+  File "/app/app.py", line 215, in preprocess_audio
+    audio_data, samplerate = sf.read(audio_stream, dtype='float32', always_2d=True)
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 305, in read
+    with SoundFile(file, 'r', samplerate, channels,
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 690, in __init__
+    self._file = self._open(file, mode_int, closefd)
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 1265, in _open
+    raise LibsndfileError(err, prefix="Error opening {0!r}: ".format(self.name))
+soundfile.LibsndfileError: Error opening <_io.BytesIO object at 0x7fa431e47ec0>: Format not recognised.
+2025-04-23 06:12:40,142 - asr:339 - WARNING - HTTP exception during transcription: 400 - Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7fa431e47ec0>: Format not recognised.
+2025-04-23 06:26:30,895 - asr:173 - INFO - ASR Service starting up...
+2025-04-23 06:26:30,895 - asr:65 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 06:26:31,043 - asr:80 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-23 06:26:31,043 - asr:81 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 06:26:31,043 - asr:82 - INFO - Configured ASR device: 'auto'
+2025-04-23 06:26:31,044 - asr:92 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-23 06:26:31,044 - asr:100 - INFO - ASR effective device set to: cuda
+2025-04-23 06:26:31,044 - asr:125 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-23 06:26:31,044 - asr:126 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-23 06:26:31,045 - asr:127 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-23 06:26:31,045 - asr:134 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-23 06:26:35,446 - asr:150 - INFO - ASR Model 'large-v3' loaded successfully in 4.40 seconds.
+2025-04-23 06:26:35,448 - asr:166 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-23 06:53:42,288 - asr:273 - INFO - Received transcription request for file: recording-1745391222273.wav (audio/webm;codecs=opus)
+2025-04-23 06:53:42,296 - asr:256 - ERROR - Soundfile error processing audio 'recording-1745391222273.wav': Error opening <_io.BytesIO object at 0x7f35f31ec8b0>: Format not recognised.
+Traceback (most recent call last):
+  File "/app/app.py", line 215, in preprocess_audio
+    audio_data, samplerate = sf.read(audio_stream, dtype='float32', always_2d=True)
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 305, in read
+    with SoundFile(file, 'r', samplerate, channels,
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 690, in __init__
+    self._file = self._open(file, mode_int, closefd)
+  File "/app/.venv/lib/python3.10/site-packages/soundfile.py", line 1265, in _open
+    raise LibsndfileError(err, prefix="Error opening {0!r}: ".format(self.name))
+soundfile.LibsndfileError: Error opening <_io.BytesIO object at 0x7f35f31ec8b0>: Format not recognised.
+2025-04-23 06:53:42,300 - asr:339 - WARNING - HTTP exception during transcription: 400 - Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7f35f31ec8b0>: Format not recognised.
+2025-04-23 07:12:57,329 - asr:97 - INFO - ASR Service starting up...
+2025-04-23 07:12:57,329 - asr:57 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 07:12:57,478 - asr:65 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-23 07:12:57,478 - asr:66 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 07:12:57,478 - asr:67 - INFO - Configured ASR device: 'auto'
+2025-04-23 07:12:57,478 - asr:70 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-23 07:12:57,479 - asr:73 - INFO - ASR effective device set to: cuda
+2025-04-23 07:12:57,479 - asr:82 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-23 07:12:57,479 - asr:82 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-23 07:12:57,479 - asr:82 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-23 07:12:57,479 - asr:85 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-23 07:13:01,801 - asr:87 - INFO - ASR Model 'large-v3' loaded successfully in 4.32 seconds.
+2025-04-23 07:13:01,803 - asr:92 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-23 07:15:22,108 - asr:205 - INFO - Received transcription request for file: recording-1745392522088.wav (audio/webm;codecs=opus)
+2025-04-23 07:15:22,220 - asr:139 - INFO - Successfully converted audio 'recording-1745392522088.wav' to WAV format using pydub.
+2025-04-23 07:15:22,225 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 07:15:22,364 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (36480,)
+2025-04-23 07:15:22,365 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 07:15:22,366 - faster_whisper:324 - INFO - Processing audio with duration 00:02.280
+2025-04-23 07:15:22,458 - faster_whisper:337 - INFO - VAD filter removed 00:00.816 of audio
+2025-04-23 07:15:40,464 - asr:97 - INFO - ASR Service starting up...
+2025-04-23 07:15:40,466 - asr:57 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 07:15:40,563 - asr:65 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-23 07:15:40,564 - asr:66 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 07:15:40,564 - asr:67 - INFO - Configured ASR device: 'auto'
+2025-04-23 07:15:40,564 - asr:70 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-23 07:15:40,564 - asr:73 - INFO - ASR effective device set to: cuda
+2025-04-23 07:15:40,564 - asr:82 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-23 07:15:40,564 - asr:82 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-23 07:15:40,565 - asr:82 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-23 07:15:40,565 - asr:85 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-23 07:15:44,544 - asr:87 - INFO - ASR Model 'large-v3' loaded successfully in 3.98 seconds.
+2025-04-23 07:15:44,546 - asr:92 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-23 07:28:39,834 - asr:97 - INFO - ASR Service starting up...
+2025-04-23 07:28:39,834 - asr:57 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 07:28:39,953 - asr:65 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-23 07:28:39,954 - asr:66 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 07:28:39,954 - asr:67 - INFO - Configured ASR device: 'auto'
+2025-04-23 07:28:39,954 - asr:70 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-23 07:28:39,954 - asr:73 - INFO - ASR effective device set to: cuda
+2025-04-23 07:28:39,955 - asr:82 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-23 07:28:39,955 - asr:82 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-23 07:28:39,955 - asr:82 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-23 07:28:39,955 - asr:85 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-23 07:28:43,951 - asr:87 - INFO - ASR Model 'large-v3' loaded successfully in 4.00 seconds.
+2025-04-23 07:28:43,952 - asr:92 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-23 07:30:49,935 - asr:205 - INFO - Received transcription request for file: recording-1745393449910.wav (audio/webm;codecs=opus)
+2025-04-23 07:30:50,055 - asr:139 - INFO - Successfully converted audio 'recording-1745393449910.wav' to WAV format using pydub.
+2025-04-23 07:30:50,068 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 07:30:50,281 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (47040,)
+2025-04-23 07:30:50,282 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 07:30:50,282 - faster_whisper:324 - INFO - Processing audio with duration 00:02.940
+2025-04-23 07:30:50,389 - faster_whisper:337 - INFO - VAD filter removed 00:00.304 of audio
+2025-04-23 07:30:51,351 - asr:234 - INFO - Transcription completed in 1.068s (1 segments). Total request time: 1.416s.
+2025-04-23 07:30:51,351 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 2.94s (processed: 2.94s)
+2025-04-23 07:36:27,791 - asr:205 - INFO - Received transcription request for file: recording-1745393787784.wav (audio/webm;codecs=opus)
+2025-04-23 07:36:27,850 - asr:139 - INFO - Successfully converted audio 'recording-1745393787784.wav' to WAV format using pydub.
+2025-04-23 07:36:27,851 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 07:36:27,855 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (28800,)
+2025-04-23 07:36:27,856 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 07:36:27,856 - faster_whisper:324 - INFO - Processing audio with duration 00:01.800
+2025-04-23 07:36:27,865 - faster_whisper:337 - INFO - VAD filter removed 00:00.000 of audio
+2025-04-23 07:36:28,137 - asr:234 - INFO - Transcription completed in 0.281s (1 segments). Total request time: 0.346s.
+2025-04-23 07:36:28,137 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 1.80s (processed: 1.80s)
+2025-04-23 08:02:50,706 - asr:205 - INFO - Received transcription request for file: recording-1745395370642.wav (audio/webm;codecs=opus)
+2025-04-23 08:02:50,859 - asr:139 - INFO - Successfully converted audio 'recording-1745395370642.wav' to WAV format using pydub.
+2025-04-23 08:02:50,864 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 08:02:50,922 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (28800,)
+2025-04-23 08:02:50,923 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 08:02:50,923 - faster_whisper:324 - INFO - Processing audio with duration 00:01.800
+2025-04-23 08:02:50,943 - faster_whisper:337 - INFO - VAD filter removed 00:00.432 of audio
+2025-04-23 08:02:51,309 - asr:234 - INFO - Transcription completed in 0.386s (1 segments). Total request time: 0.603s.
+2025-04-23 08:02:51,309 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 1.80s (processed: 1.80s)
+2025-04-23 08:03:15,673 - asr:205 - INFO - Received transcription request for file: recording-1745395395666.wav (audio/webm;codecs=opus)
+2025-04-23 08:03:15,729 - asr:139 - INFO - Successfully converted audio 'recording-1745395395666.wav' to WAV format using pydub.
+2025-04-23 08:03:15,730 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 08:03:15,741 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (49920,)
+2025-04-23 08:03:15,741 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 08:03:15,741 - faster_whisper:324 - INFO - Processing audio with duration 00:03.120
+2025-04-23 08:03:15,752 - faster_whisper:337 - INFO - VAD filter removed 00:03.120 of audio
+2025-04-23 08:03:15,799 - asr:234 - INFO - Transcription completed in 0.057s (0 segments). Total request time: 0.126s.
+2025-04-23 08:03:15,799 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 3.12s (processed: 3.12s)
+2025-04-23 08:10:07,837 - asr:205 - INFO - Received transcription request for file: recording-1745395807773.wav (audio/webm;codecs=opus)
+2025-04-23 08:10:07,996 - asr:139 - INFO - Successfully converted audio 'recording-1745395807773.wav' to WAV format using pydub.
+2025-04-23 08:10:08,001 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 08:10:08,046 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (24960,)
+2025-04-23 08:10:08,046 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 08:10:08,047 - faster_whisper:324 - INFO - Processing audio with duration 00:01.560
+2025-04-23 08:10:08,063 - faster_whisper:337 - INFO - VAD filter removed 00:00.144 of audio
+2025-04-23 08:10:08,333 - asr:234 - INFO - Transcription completed in 0.286s (1 segments). Total request time: 0.496s.
+2025-04-23 08:10:08,333 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 1.56s (processed: 1.56s)
+2025-04-23 08:27:14,261 - asr:97 - INFO - ASR Service starting up...
+2025-04-23 08:27:14,261 - asr:57 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 08:27:14,340 - asr:65 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-23 08:27:14,340 - asr:66 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 08:27:14,341 - asr:67 - INFO - Configured ASR device: 'auto'
+2025-04-23 08:27:14,341 - asr:70 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-23 08:27:14,341 - asr:73 - INFO - ASR effective device set to: cuda
+2025-04-23 08:27:14,341 - asr:82 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-23 08:27:14,341 - asr:82 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-23 08:27:14,341 - asr:82 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-23 08:27:14,342 - asr:85 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-23 08:27:18,038 - asr:87 - INFO - ASR Model 'large-v3' loaded successfully in 3.70 seconds.
+2025-04-23 08:27:18,043 - asr:92 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-23 08:49:19,937 - asr:97 - INFO - ASR Service starting up...
+2025-04-23 08:49:19,938 - asr:57 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 08:49:20,015 - asr:65 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-23 08:49:20,015 - asr:66 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 08:49:20,015 - asr:67 - INFO - Configured ASR device: 'auto'
+2025-04-23 08:49:20,015 - asr:70 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-23 08:49:20,015 - asr:73 - INFO - ASR effective device set to: cuda
+2025-04-23 08:49:20,015 - asr:82 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-23 08:49:20,016 - asr:82 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-23 08:49:20,016 - asr:82 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-23 08:49:20,016 - asr:85 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-23 08:49:23,793 - asr:87 - INFO - ASR Model 'large-v3' loaded successfully in 3.78 seconds.
+2025-04-23 08:49:23,795 - asr:92 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-23 08:51:02,299 - asr:205 - INFO - Received transcription request for file: recording-1745398262232.wav (audio/webm;codecs=opus)
+2025-04-23 08:51:02,471 - asr:139 - INFO - Successfully converted audio 'recording-1745398262232.wav' to WAV format using pydub.
+2025-04-23 08:51:02,481 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 08:51:02,707 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (31680,)
+2025-04-23 08:51:02,707 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 08:51:02,707 - faster_whisper:324 - INFO - Processing audio with duration 00:01.980
+2025-04-23 08:51:02,804 - faster_whisper:337 - INFO - VAD filter removed 00:00.208 of audio
+2025-04-23 08:51:03,298 - asr:234 - INFO - Transcription completed in 0.591s (1 segments). Total request time: 0.999s.
+2025-04-23 08:51:03,299 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 1.98s (processed: 1.98s)
+2025-04-23 08:52:35,872 - asr:205 - INFO - Received transcription request for file: recording-1745398355822.wav (audio/webm;codecs=opus)
+2025-04-23 08:52:35,925 - asr:139 - INFO - Successfully converted audio 'recording-1745398355822.wav' to WAV format using pydub.
+2025-04-23 08:52:35,926 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 08:52:35,928 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (17280,)
+2025-04-23 08:52:35,928 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 08:52:35,928 - faster_whisper:324 - INFO - Processing audio with duration 00:01.080
+2025-04-23 08:52:35,932 - faster_whisper:337 - INFO - VAD filter removed 00:01.080 of audio
+2025-04-23 08:52:35,986 - asr:234 - INFO - Transcription completed in 0.058s (0 segments). Total request time: 0.114s.
+2025-04-23 08:52:35,988 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 1.08s (processed: 1.08s)
+2025-04-23 08:54:32,076 - asr:205 - INFO - Received transcription request for file: recording-1745398472070.wav (audio/webm;codecs=opus)
+2025-04-23 08:54:32,130 - asr:139 - INFO - Successfully converted audio 'recording-1745398472070.wav' to WAV format using pydub.
+2025-04-23 08:54:32,131 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 08:54:32,133 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (32640,)
+2025-04-23 08:54:32,133 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 08:54:32,134 - faster_whisper:324 - INFO - Processing audio with duration 00:02.040
+2025-04-23 08:54:32,140 - faster_whisper:337 - INFO - VAD filter removed 00:02.040 of audio
+2025-04-23 08:54:32,214 - asr:234 - INFO - Transcription completed in 0.081s (0 segments). Total request time: 0.138s.
+2025-04-23 08:54:32,215 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 2.04s (processed: 2.04s)
+2025-04-23 09:19:53,236 - asr:97 - INFO - ASR Service starting up...
+2025-04-23 09:19:53,237 - asr:57 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 09:19:53,314 - asr:65 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-23 09:19:53,315 - asr:66 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 09:19:53,315 - asr:67 - INFO - Configured ASR device: 'auto'
+2025-04-23 09:19:53,315 - asr:70 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-23 09:19:53,315 - asr:73 - INFO - ASR effective device set to: cuda
+2025-04-23 09:19:53,315 - asr:82 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-23 09:19:53,315 - asr:82 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-23 09:19:53,315 - asr:82 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-23 09:19:53,316 - asr:85 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-23 09:19:57,783 - asr:87 - INFO - ASR Model 'large-v3' loaded successfully in 4.47 seconds.
+2025-04-23 09:19:57,784 - asr:92 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-23 09:23:21,666 - asr:205 - INFO - Received transcription request for file: recording-1745400201639.wav (audio/webm;codecs=opus)
+2025-04-23 09:23:21,856 - asr:139 - INFO - Successfully converted audio 'recording-1745400201639.wav' to WAV format using pydub.
+2025-04-23 09:23:21,872 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 09:23:22,227 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (40320,)
+2025-04-23 09:23:22,229 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 09:23:22,230 - faster_whisper:324 - INFO - Processing audio with duration 00:02.520
+2025-04-23 09:23:22,329 - faster_whisper:337 - INFO - VAD filter removed 00:00.000 of audio
+2025-04-23 09:23:23,030 - asr:234 - INFO - Transcription completed in 0.800s (1 segments). Total request time: 1.364s.
+2025-04-23 09:23:23,030 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 2.52s (processed: 2.52s)
+2025-04-23 09:37:57,169 - asr:97 - INFO - ASR Service starting up...
+2025-04-23 09:37:57,169 - asr:57 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 09:37:57,250 - asr:65 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-23 09:37:57,250 - asr:66 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 09:37:57,250 - asr:67 - INFO - Configured ASR device: 'auto'
+2025-04-23 09:37:57,250 - asr:70 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-23 09:37:57,250 - asr:73 - INFO - ASR effective device set to: cuda
+2025-04-23 09:37:57,251 - asr:82 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-23 09:37:57,251 - asr:82 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-23 09:37:57,251 - asr:82 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-23 09:37:57,251 - asr:85 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-23 09:38:00,864 - asr:87 - INFO - ASR Model 'large-v3' loaded successfully in 3.61 seconds.
+2025-04-23 09:38:00,865 - asr:92 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-23 10:48:20,664 - asr:205 - INFO - Received transcription request for file: recording-1745405300597.wav (audio/webm;codecs=opus)
+2025-04-23 10:48:20,966 - asr:139 - INFO - Successfully converted audio 'recording-1745405300597.wav' to WAV format using pydub.
+2025-04-23 10:48:20,994 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 10:48:21,627 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (35520,)
+2025-04-23 10:48:21,628 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 10:48:21,628 - faster_whisper:324 - INFO - Processing audio with duration 00:02.220
+2025-04-23 10:48:21,982 - faster_whisper:337 - INFO - VAD filter removed 00:00.000 of audio
+2025-04-23 10:48:22,955 - asr:234 - INFO - Transcription completed in 1.327s (1 segments). Total request time: 2.291s.
+2025-04-23 10:48:22,955 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 2.22s (processed: 2.22s)
+2025-04-23 11:09:22,229 - asr:205 - INFO - Received transcription request for file: recording-1745406562169.wav (audio/webm;codecs=opus)
+2025-04-23 11:09:22,406 - asr:139 - INFO - Successfully converted audio 'recording-1745406562169.wav' to WAV format using pydub.
+2025-04-23 11:09:22,411 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 11:09:22,462 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (28800,)
+2025-04-23 11:09:22,462 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 11:09:22,463 - faster_whisper:324 - INFO - Processing audio with duration 00:01.800
+2025-04-23 11:09:22,485 - faster_whisper:337 - INFO - VAD filter removed 00:00.368 of audio
+2025-04-23 11:09:22,787 - asr:234 - INFO - Transcription completed in 0.324s (1 segments). Total request time: 0.558s.
+2025-04-23 11:09:22,788 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 1.80s (processed: 1.80s)
+2025-04-23 11:10:21,340 - asr:205 - INFO - Received transcription request for file: recording-1745406621288.wav (audio/webm;codecs=opus)
+2025-04-23 11:10:21,504 - asr:139 - INFO - Successfully converted audio 'recording-1745406621288.wav' to WAV format using pydub.
+2025-04-23 11:10:21,505 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 11:10:21,517 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (31680,)
+2025-04-23 11:10:21,520 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 11:10:21,520 - faster_whisper:324 - INFO - Processing audio with duration 00:01.980
+2025-04-23 11:10:21,528 - faster_whisper:337 - INFO - VAD filter removed 00:00.400 of audio
+2025-04-23 11:10:21,881 - asr:234 - INFO - Transcription completed in 0.360s (1 segments). Total request time: 0.541s.
+2025-04-23 11:10:21,881 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 1.98s (processed: 1.98s)
+2025-04-23 12:30:51,105 - asr:205 - INFO - Received transcription request for file: recording-1745411451055.wav (audio/webm;codecs=opus)
+2025-04-23 12:30:51,276 - asr:139 - INFO - Successfully converted audio 'recording-1745411451055.wav' to WAV format using pydub.
+2025-04-23 12:30:51,285 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 12:30:51,352 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (46080,)
+2025-04-23 12:30:51,353 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 12:30:51,354 - faster_whisper:324 - INFO - Processing audio with duration 00:02.880
+2025-04-23 12:30:51,402 - faster_whisper:337 - INFO - VAD filter removed 00:00.688 of audio
+2025-04-23 12:30:52,106 - asr:234 - INFO - Transcription completed in 0.752s (1 segments). Total request time: 1.001s.
+2025-04-23 12:30:52,106 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 2.88s (processed: 2.88s)
+2025-04-23 12:35:37,925 - asr:205 - INFO - Received transcription request for file: recording-1745411737868.wav (audio/webm;codecs=opus)
+2025-04-23 12:35:37,989 - asr:139 - INFO - Successfully converted audio 'recording-1745411737868.wav' to WAV format using pydub.
+2025-04-23 12:35:37,991 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 12:35:37,994 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (31680,)
+2025-04-23 12:35:37,995 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 12:35:38,002 - faster_whisper:324 - INFO - Processing audio with duration 00:01.980
+2025-04-23 12:35:38,013 - faster_whisper:337 - INFO - VAD filter removed 00:00.144 of audio
+2025-04-23 12:35:38,264 - asr:234 - INFO - Transcription completed in 0.262s (1 segments). Total request time: 0.339s.
+2025-04-23 12:35:38,265 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 1.98s (processed: 1.98s)
+2025-04-23 13:40:02,678 - asr:205 - INFO - Received transcription request for file: recording-1745415602629.wav (audio/webm;codecs=opus)
+2025-04-23 13:40:02,848 - asr:139 - INFO - Successfully converted audio 'recording-1745415602629.wav' to WAV format using pydub.
+2025-04-23 13:40:02,861 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 13:40:02,960 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (28800,)
+2025-04-23 13:40:02,964 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 13:40:02,966 - faster_whisper:324 - INFO - Processing audio with duration 00:01.800
+2025-04-23 13:40:03,015 - faster_whisper:337 - INFO - VAD filter removed 00:00.000 of audio
+2025-04-23 13:40:03,425 - asr:234 - INFO - Transcription completed in 0.461s (1 segments). Total request time: 0.747s.
+2025-04-23 13:40:03,425 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 1.80s (processed: 1.80s)
+2025-04-23 13:53:41,870 - asr:205 - INFO - Received transcription request for file: recording-1745416421836.wav (audio/webm;codecs=opus)
+2025-04-23 13:53:42,039 - asr:139 - INFO - Successfully converted audio 'recording-1745416421836.wav' to WAV format using pydub.
+2025-04-23 13:53:42,051 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 13:53:42,137 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (37440,)
+2025-04-23 13:53:42,137 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 13:53:42,139 - faster_whisper:324 - INFO - Processing audio with duration 00:02.340
+2025-04-23 13:53:42,181 - faster_whisper:337 - INFO - VAD filter removed 00:00.112 of audio
+2025-04-23 13:53:42,649 - asr:234 - INFO - Transcription completed in 0.512s (1 segments). Total request time: 0.780s.
+2025-04-23 13:53:42,650 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 2.34s (processed: 2.34s)
+2025-04-23 14:20:29,233 - asr:205 - INFO - Received transcription request for file: recording-1745418029182.wav (audio/webm;codecs=opus)
+2025-04-23 14:20:29,421 - asr:139 - INFO - Successfully converted audio 'recording-1745418029182.wav' to WAV format using pydub.
+2025-04-23 14:20:29,448 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 14:20:29,568 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (48960,)
+2025-04-23 14:20:29,569 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 14:20:29,571 - faster_whisper:324 - INFO - Processing audio with duration 00:03.060
+2025-04-23 14:20:29,658 - faster_whisper:337 - INFO - VAD filter removed 00:00.048 of audio
+2025-04-23 14:20:30,351 - asr:234 - INFO - Transcription completed in 0.782s (1 segments). Total request time: 1.118s.
+2025-04-23 14:20:30,352 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 3.06s (processed: 3.06s)
+2025-04-23 14:38:39,486 - asr:205 - INFO - Received transcription request for file: recording-1745419119447.wav (audio/webm;codecs=opus)
+2025-04-23 14:38:39,657 - asr:139 - INFO - Successfully converted audio 'recording-1745419119447.wav' to WAV format using pydub.
+2025-04-23 14:38:39,669 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 14:38:39,767 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (37440,)
+2025-04-23 14:38:39,767 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 14:38:39,768 - faster_whisper:324 - INFO - Processing audio with duration 00:02.340
+2025-04-23 14:38:39,828 - faster_whisper:337 - INFO - VAD filter removed 00:00.176 of audio
+2025-04-23 14:38:40,333 - asr:234 - INFO - Transcription completed in 0.566s (1 segments). Total request time: 0.847s.
+2025-04-23 14:38:40,333 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 2.34s (processed: 2.34s)
+2025-04-23 15:03:20,159 - asr:205 - INFO - Received transcription request for file: recording-1745420600108.wav (audio/webm;codecs=opus)
+2025-04-23 15:03:20,336 - asr:139 - INFO - Successfully converted audio 'recording-1745420600108.wav' to WAV format using pydub.
+2025-04-23 15:03:20,354 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 15:03:20,440 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (67200,)
+2025-04-23 15:03:20,441 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 15:03:20,442 - faster_whisper:324 - INFO - Processing audio with duration 00:04.200
+2025-04-23 15:03:20,495 - faster_whisper:337 - INFO - VAD filter removed 00:00.432 of audio
+2025-04-23 15:03:21,140 - asr:234 - INFO - Transcription completed in 0.699s (1 segments). Total request time: 0.982s.
+2025-04-23 15:03:21,141 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 4.20s (processed: 4.20s)
+2025-04-23 15:20:32,263 - asr:205 - INFO - Received transcription request for file: recording-1745421632244.wav (audio/webm;codecs=opus)
+2025-04-23 15:20:32,428 - asr:139 - INFO - Successfully converted audio 'recording-1745421632244.wav' to WAV format using pydub.
+2025-04-23 15:20:32,434 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 15:20:32,493 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (52800,)
+2025-04-23 15:20:32,493 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 15:20:32,494 - faster_whisper:324 - INFO - Processing audio with duration 00:03.300
+2025-04-23 15:20:32,519 - faster_whisper:337 - INFO - VAD filter removed 00:00.336 of audio
+2025-04-23 15:20:33,224 - asr:234 - INFO - Transcription completed in 0.731s (2 segments). Total request time: 0.961s.
+2025-04-23 15:20:33,224 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 3.30s (processed: 3.30s)
+2025-04-23 15:36:56,877 - asr:205 - INFO - Received transcription request for file: recording-1745422616858.wav (audio/webm;codecs=opus)
+2025-04-23 15:36:57,029 - asr:139 - INFO - Successfully converted audio 'recording-1745422616858.wav' to WAV format using pydub.
+2025-04-23 15:36:57,032 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 15:36:57,068 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (38400,)
+2025-04-23 15:36:57,068 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 15:36:57,069 - faster_whisper:324 - INFO - Processing audio with duration 00:02.400
+2025-04-23 15:36:57,094 - faster_whisper:337 - INFO - VAD filter removed 00:00.176 of audio
+2025-04-23 15:36:57,426 - asr:234 - INFO - Transcription completed in 0.358s (1 segments). Total request time: 0.549s.
+2025-04-23 15:36:57,427 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 2.40s (processed: 2.40s)
+2025-04-23 15:43:15,134 - asr:205 - INFO - Received transcription request for file: recording-1745422995128.wav (audio/webm;codecs=opus)
+2025-04-23 15:43:15,195 - asr:139 - INFO - Successfully converted audio 'recording-1745422995128.wav' to WAV format using pydub.
+2025-04-23 15:43:15,196 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 15:43:15,198 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (41280,)
+2025-04-23 15:43:15,198 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 15:43:15,199 - faster_whisper:324 - INFO - Processing audio with duration 00:02.580
+2025-04-23 15:43:15,208 - faster_whisper:337 - INFO - VAD filter removed 00:00.944 of audio
+2025-04-23 15:43:15,709 - asr:234 - INFO - Transcription completed in 0.511s (1 segments). Total request time: 0.575s.
+2025-04-23 15:43:15,709 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 2.58s (processed: 2.58s)
+2025-04-23 15:44:48,941 - asr:205 - INFO - Received transcription request for file: recording-1745423088934.wav (audio/webm;codecs=opus)
+2025-04-23 15:44:48,997 - asr:139 - INFO - Successfully converted audio 'recording-1745423088934.wav' to WAV format using pydub.
+2025-04-23 15:44:48,998 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 15:44:49,000 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (48000,)
+2025-04-23 15:44:49,001 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 15:44:49,001 - faster_whisper:324 - INFO - Processing audio with duration 00:03.000
+2025-04-23 15:44:49,011 - faster_whisper:337 - INFO - VAD filter removed 00:00.464 of audio
+2025-04-23 15:44:49,459 - asr:234 - INFO - Transcription completed in 0.458s (1 segments). Total request time: 0.518s.
+2025-04-23 15:44:49,459 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 3.00s (processed: 3.00s)
+2025-04-23 16:00:27,614 - asr:205 - INFO - Received transcription request for file: recording-1745424027566.wav (audio/webm;codecs=opus)
+2025-04-23 16:00:27,792 - asr:139 - INFO - Successfully converted audio 'recording-1745424027566.wav' to WAV format using pydub.
+2025-04-23 16:00:27,794 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 16:00:27,809 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (29760,)
+2025-04-23 16:00:27,809 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 16:00:27,810 - faster_whisper:324 - INFO - Processing audio with duration 00:01.860
+2025-04-23 16:00:27,821 - faster_whisper:337 - INFO - VAD filter removed 00:00.208 of audio
+2025-04-23 16:00:28,091 - asr:234 - INFO - Transcription completed in 0.281s (1 segments). Total request time: 0.476s.
+2025-04-23 16:00:28,091 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 1.86s (processed: 1.86s)
+2025-04-23 16:08:03,214 - asr:205 - INFO - Received transcription request for file: recording-1745424483207.wav (audio/webm;codecs=opus)
+2025-04-23 16:08:03,271 - asr:139 - INFO - Successfully converted audio 'recording-1745424483207.wav' to WAV format using pydub.
+2025-04-23 16:08:03,272 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 16:08:03,275 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (37440,)
+2025-04-23 16:08:03,275 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 16:08:03,275 - faster_whisper:324 - INFO - Processing audio with duration 00:02.340
+2025-04-23 16:08:03,283 - faster_whisper:337 - INFO - VAD filter removed 00:00.304 of audio
+2025-04-23 16:08:03,571 - asr:234 - INFO - Transcription completed in 0.295s (1 segments). Total request time: 0.357s.
+2025-04-23 16:08:03,572 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 2.34s (processed: 2.34s)
+2025-04-23 16:46:27,233 - asr:205 - INFO - Received transcription request for file: recording-1745426787197.wav (audio/webm;codecs=opus)
+2025-04-23 16:46:27,403 - asr:139 - INFO - Successfully converted audio 'recording-1745426787197.wav' to WAV format using pydub.
+2025-04-23 16:46:27,414 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-23 16:46:27,494 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (30720,)
+2025-04-23 16:46:27,495 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-23 16:46:27,496 - faster_whisper:324 - INFO - Processing audio with duration 00:01.920
+2025-04-23 16:46:27,539 - faster_whisper:337 - INFO - VAD filter removed 00:00.112 of audio
+2025-04-23 16:46:28,184 - asr:234 - INFO - Transcription completed in 0.689s (1 segments). Total request time: 0.951s.
+2025-04-23 16:46:28,184 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 1.92s (processed: 1.92s)
+2025-04-24 00:31:36,564 - asr:97 - INFO - ASR Service starting up...
+2025-04-24 00:31:36,565 - asr:57 - INFO - Loading configuration from: /app/config.yaml
+2025-04-24 00:31:36,696 - asr:65 - INFO - CUDA available: True, Torch version: 2.4.0+cu121
+2025-04-24 00:31:36,696 - asr:66 - INFO - USE_GPU environment variable: 'auto'
+2025-04-24 00:31:36,697 - asr:67 - INFO - Configured ASR device: 'auto'
+2025-04-24 00:31:36,697 - asr:70 - INFO - Attempting to use CUDA device 'cuda' for ASR.
+2025-04-24 00:31:36,697 - asr:73 - INFO - ASR effective device set to: cuda
+2025-04-24 00:31:36,697 - asr:82 - INFO - Attempting to load/download ASR model: large-v3
+2025-04-24 00:31:36,697 - asr:82 - INFO - Target device: cuda, Compute type: int8_float16
+2025-04-24 00:31:36,697 - asr:82 - INFO - Using cache directory (HF_HOME): /cache/huggingface
+2025-04-24 00:31:36,697 - asr:85 - INFO - Logging into Hugging Face Hub using provided token.
+2025-04-24 00:31:40,773 - asr:87 - INFO - ASR Model 'large-v3' loaded successfully in 4.08 seconds.
+2025-04-24 00:31:40,774 - asr:92 - WARNING - Could not log out from Hugging Face Hub: [Errno 2] No such file or directory: 'git'
+2025-04-24 00:32:53,540 - asr:205 - INFO - Received transcription request for file: recording-1745454773465.wav (audio/webm;codecs=opus)
+2025-04-24 00:32:53,727 - asr:139 - INFO - Successfully converted audio 'recording-1745454773465.wav' to WAV format using pydub.
+2025-04-24 00:32:53,741 - asr:164 - INFO - Resampling audio from 48000Hz to 16000Hz using torchaudio...
+2025-04-24 00:32:54,003 - asr:172 - INFO - Resampled audio to 16kHz. New shape: (13440,)
+2025-04-24 00:32:54,003 - asr:220 - INFO - Starting transcription (beam=5, lang=en, vad=True)...
+2025-04-24 00:32:54,004 - faster_whisper:324 - INFO - Processing audio with duration 00:00.840
+2025-04-24 00:32:54,103 - faster_whisper:337 - INFO - VAD filter removed 00:00.840 of audio
+2025-04-24 00:32:54,172 - asr:234 - INFO - Transcription completed in 0.168s (0 segments). Total request time: 0.632s.
+2025-04-24 00:32:54,172 - asr:235 - INFO - Detected lang: en (Prob: 1.00), Audio duration: 0.84s (processed: 0.84s)

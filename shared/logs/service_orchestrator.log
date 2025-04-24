@@ -1,0 +1,678 @@
+2025-04-21 11:19:07,867 - orchestrator:257 - INFO - ORCHESTRATOR Service starting up...
+2025-04-21 11:19:07,867 - orchestrator:58 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 11:19:07,872 - orchestrator:74 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-21 11:19:07,872 - orchestrator:75 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-21 11:19:07,872 - orchestrator:76 - INFO - TTS Endpoint: http://tts:5003/synthesize
+2025-04-21 11:19:07,873 - orchestrator:82 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-21 11:19:07,873 - orchestrator:89 - INFO - Loaded system prompt from config.
+2025-04-21 11:19:07,888 - orchestrator:265 - INFO - HTTP client initialized.
+2025-04-21 11:19:12,893 - orchestrator:285 - INFO - Checking backend service connectivity...
+2025-04-21 11:19:12,902 - httpx:1786 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-21 11:19:12,903 - orchestrator:298 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-21 11:19:12,905 - httpx:1786 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-21 11:19:12,906 - orchestrator:298 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-21 11:19:12,908 - httpx:1786 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-21 11:19:12,908 - orchestrator:298 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-21 11:19:12,908 - orchestrator:308 - INFO - Initial backend service connectivity checks passed (services might still be loading models).
+2025-04-21 11:31:33,325 - orchestrator:298 - INFO - ORCHESTRATOR Service starting up...
+2025-04-21 11:31:33,326 - orchestrator:58 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 11:31:33,330 - orchestrator:75 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-21 11:31:33,330 - orchestrator:76 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-21 11:31:33,331 - orchestrator:77 - INFO - TTS WebSocket Endpoint: http://tts:5003/synthesize_stream
+2025-04-21 11:31:33,331 - orchestrator:82 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-21 11:31:33,331 - orchestrator:88 - INFO - Loaded system prompt from config.
+2025-04-21 11:31:33,356 - orchestrator:304 - INFO - HTTP client initialized.
+2025-04-21 11:31:38,361 - orchestrator:319 - INFO - Checking backend service connectivity...
+2025-04-21 11:31:38,366 - httpx:1740 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-21 11:31:38,367 - orchestrator:327 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-21 11:31:38,369 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-21 11:31:38,369 - orchestrator:327 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-21 11:31:38,371 - httpx:1740 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-21 11:31:38,371 - orchestrator:327 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-21 11:31:38,371 - orchestrator:331 - INFO - Initial backend service connectivity checks passed.
+2025-04-23 06:12:33,921 - orchestrator:427 - INFO - Conversation history reset via API.
+2025-04-23 06:12:35,075 - orchestrator:349 - INFO - Received /assist request for file: recording-1745388755024.wav
+2025-04-23 06:12:35,076 - orchestrator:118 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 06:12:35,209 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 400 Bad Request"
+2025-04-23 06:12:35,211 - orchestrator:130 - ERROR - ASR service error: Status 400, Response: {"detail":"Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7fa44b7ec720>: Format not recognised."}
+2025-04-23 06:12:35,212 - orchestrator:406 - ERROR - Pipeline failed due to HTTPException: 502 - ASR service error (400): Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7fa44b7ec720>: Format not recognised.
+2025-04-23 06:12:37,582 - orchestrator:427 - INFO - Conversation history reset via API.
+2025-04-23 06:12:38,059 - orchestrator:349 - INFO - Received /assist request for file: recording-1745388758010.wav
+2025-04-23 06:12:38,060 - orchestrator:118 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 06:12:38,063 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 400 Bad Request"
+2025-04-23 06:12:38,064 - orchestrator:130 - ERROR - ASR service error: Status 400, Response: {"detail":"Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7fa431e47c40>: Format not recognised."}
+2025-04-23 06:12:38,064 - orchestrator:406 - ERROR - Pipeline failed due to HTTPException: 502 - ASR service error (400): Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7fa431e47c40>: Format not recognised.
+2025-04-23 06:12:39,766 - orchestrator:427 - INFO - Conversation history reset via API.
+2025-04-23 06:12:40,139 - orchestrator:349 - INFO - Received /assist request for file: recording-1745388760089.wav
+2025-04-23 06:12:40,139 - orchestrator:118 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 06:12:40,143 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 400 Bad Request"
+2025-04-23 06:12:40,144 - orchestrator:130 - ERROR - ASR service error: Status 400, Response: {"detail":"Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7fa431e47ec0>: Format not recognised."}
+2025-04-23 06:12:40,144 - orchestrator:406 - ERROR - Pipeline failed due to HTTPException: 502 - ASR service error (400): Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7fa431e47ec0>: Format not recognised.
+2025-04-23 06:26:28,206 - orchestrator:298 - INFO - ORCHESTRATOR Service starting up...
+2025-04-23 06:26:28,206 - orchestrator:58 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 06:26:28,211 - orchestrator:75 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-23 06:26:28,211 - orchestrator:76 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-23 06:26:28,212 - orchestrator:77 - INFO - TTS WebSocket Endpoint: http://tts:5003/synthesize_stream
+2025-04-23 06:26:28,212 - orchestrator:82 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-23 06:26:28,212 - orchestrator:88 - INFO - Loaded system prompt from config.
+2025-04-23 06:26:28,260 - orchestrator:304 - INFO - HTTP client initialized.
+2025-04-23 06:26:33,262 - orchestrator:319 - INFO - Checking backend service connectivity...
+2025-04-23 06:26:33,268 - orchestrator:328 - ERROR - Failed to connect to backend service ASR at http://asr:5001/health: All connection attempts failed
+2025-04-23 06:26:33,270 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-23 06:26:33,270 - orchestrator:327 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-23 06:26:33,271 - orchestrator:328 - ERROR - Failed to connect to backend service TTS at http://tts:5003/health: All connection attempts failed
+2025-04-23 06:26:33,272 - orchestrator:330 - ERROR - One or more critical backend services could not be reached during startup check.
+2025-04-23 06:28:43,622 - orchestrator:427 - INFO - Conversation history reset via API.
+2025-04-23 06:30:48,241 - orchestrator:427 - INFO - Conversation history reset via API.
+2025-04-23 06:50:59,635 - orchestrator:289 - INFO - ORCHESTRATOR Service starting up...
+2025-04-23 06:50:59,636 - orchestrator:61 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 06:50:59,640 - orchestrator:78 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-23 06:50:59,640 - orchestrator:79 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-23 06:50:59,640 - orchestrator:80 - INFO - TTS WebSocket Endpoint: http://tts:5003/synthesize_stream
+2025-04-23 06:50:59,640 - orchestrator:85 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-23 06:50:59,641 - orchestrator:91 - INFO - Loaded system prompt from config.
+2025-04-23 06:50:59,666 - orchestrator:295 - INFO - HTTP client initialized.
+2025-04-23 06:51:04,672 - orchestrator:310 - INFO - Checking backend service connectivity...
+2025-04-23 06:51:04,680 - httpx:1740 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-23 06:51:04,680 - orchestrator:318 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-23 06:51:04,683 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-23 06:51:04,683 - orchestrator:318 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-23 06:51:04,686 - httpx:1740 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-23 06:51:04,686 - orchestrator:318 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-23 06:51:04,687 - orchestrator:322 - INFO - Initial backend service connectivity checks passed.
+2025-04-23 06:53:37,976 - orchestrator:432 - INFO - Conversation history reset via API.
+2025-04-23 06:53:42,277 - orchestrator:357 - INFO - Received /assist request for file: recording-1745391222273.wav
+2025-04-23 06:53:42,278 - orchestrator:120 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 06:53:42,302 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 400 Bad Request"
+2025-04-23 06:53:42,302 - orchestrator:132 - ERROR - ASR service error: Status 400, Response: {"detail":"Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7f35f31ec8b0>: Format not recognised."}
+2025-04-23 06:53:42,303 - orchestrator:413 - ERROR - Pipeline failed due to HTTPException: 502 - ASR service error (400): Could not read or decode audio file: Error opening <_io.BytesIO object at 0x7f35f31ec8b0>: Format not recognised.
+2025-04-23 07:13:11,141 - orchestrator:289 - INFO - ORCHESTRATOR Service starting up...
+2025-04-23 07:13:11,141 - orchestrator:61 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 07:13:11,146 - orchestrator:78 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-23 07:13:11,146 - orchestrator:79 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-23 07:13:11,146 - orchestrator:80 - INFO - TTS WebSocket Endpoint: http://tts:5003/synthesize_stream
+2025-04-23 07:13:11,147 - orchestrator:85 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-23 07:13:11,147 - orchestrator:91 - INFO - Loaded system prompt from config.
+2025-04-23 07:13:11,180 - orchestrator:295 - INFO - HTTP client initialized.
+2025-04-23 07:13:16,186 - orchestrator:310 - INFO - Checking backend service connectivity...
+2025-04-23 07:13:16,194 - httpx:1740 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-23 07:13:16,195 - orchestrator:318 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-23 07:13:16,197 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-23 07:13:16,197 - orchestrator:318 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-23 07:13:16,199 - httpx:1740 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-23 07:13:16,200 - orchestrator:318 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-23 07:13:16,200 - orchestrator:322 - INFO - Initial backend service connectivity checks passed.
+2025-04-23 07:15:19,696 - orchestrator:432 - INFO - Conversation history reset via API.
+2025-04-23 07:15:22,091 - orchestrator:357 - INFO - Received /assist request for file: recording-1745392522088.wav
+2025-04-23 07:15:22,092 - orchestrator:120 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 07:15:38,112 - orchestrator:130 - ERROR - ASR request error to http://asr:5001/transcribe: Server disconnected without sending a response.
+2025-04-23 07:15:38,113 - orchestrator:413 - ERROR - Pipeline failed due to HTTPException: 502 - ASR service request failed: Server disconnected without sending a response.
+2025-04-23 07:28:53,978 - orchestrator:289 - INFO - ORCHESTRATOR Service starting up...
+2025-04-23 07:28:53,978 - orchestrator:61 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 07:28:53,983 - orchestrator:78 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-23 07:28:53,983 - orchestrator:79 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-23 07:28:53,983 - orchestrator:80 - INFO - TTS WebSocket Endpoint: http://tts:5003/synthesize_stream
+2025-04-23 07:28:53,983 - orchestrator:85 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-23 07:28:53,983 - orchestrator:91 - INFO - Loaded system prompt from config.
+2025-04-23 07:28:54,019 - orchestrator:295 - INFO - HTTP client initialized.
+2025-04-23 07:28:59,023 - orchestrator:310 - INFO - Checking backend service connectivity...
+2025-04-23 07:28:59,035 - httpx:1740 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-23 07:28:59,035 - orchestrator:318 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-23 07:28:59,038 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-23 07:28:59,038 - orchestrator:318 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-23 07:28:59,040 - httpx:1740 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-23 07:28:59,041 - orchestrator:318 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-23 07:28:59,041 - orchestrator:322 - INFO - Initial backend service connectivity checks passed.
+2025-04-23 07:30:46,829 - orchestrator:432 - INFO - Conversation history reset via API.
+2025-04-23 07:30:49,914 - orchestrator:357 - INFO - Received /assist request for file: recording-1745393449910.wav
+2025-04-23 07:30:49,914 - orchestrator:120 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 07:30:51,352 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 07:30:51,352 - orchestrator:127 - INFO - ASR Response: 'Test stand, test stand, one, two, three....'
+2025-04-23 07:30:51,353 - orchestrator:146 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 07:30:52,175 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 07:30:52,175 - orchestrator:154 - INFO - LLM Response: '"Okay, test stand, we're on. Please go through your routine and confirm that everything is functioni...'
+2025-04-23 07:30:52,176 - orchestrator:172 - INFO - Connecting to TTS WebSocket at http://tts:5003/synthesize_stream for utterance_id: b906837a-3ce7-4273-aa18-7eb2b6c925a7
+2025-04-23 07:30:52,176 - orchestrator:173 - INFO - Sending text to TTS service via WS: '"Okay, test stand, we're on. Please go through you...'
+2025-04-23 07:30:52,179 - orchestrator:261 - ERROR - Invalid TTS WebSocket URI: http://tts:5003/synthesize_stream
+2025-04-23 07:30:52,179 - orchestrator:413 - ERROR - Pipeline failed due to HTTPException: 500 - Invalid TTS WebSocket URI configured.
+2025-04-23 07:35:55,886 - orchestrator:313 - INFO - ORCHESTRATOR Service starting up...
+2025-04-23 07:35:55,887 - orchestrator:75 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 07:35:55,891 - orchestrator:108 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-23 07:35:55,891 - orchestrator:109 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-23 07:35:55,891 - orchestrator:110 - INFO - TTS WebSocket Endpoint: ws://tts:5003/synthesize_stream
+2025-04-23 07:35:55,891 - orchestrator:115 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-23 07:35:55,891 - orchestrator:121 - INFO - Loaded system prompt from config.
+2025-04-23 07:35:55,917 - orchestrator:319 - INFO - HTTP client initialized.
+2025-04-23 07:36:00,923 - orchestrator:336 - INFO - Checking backend service connectivity...
+2025-04-23 07:36:00,930 - httpx:1740 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-23 07:36:00,930 - orchestrator:346 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-23 07:36:00,932 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-23 07:36:00,933 - orchestrator:346 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-23 07:36:00,935 - httpx:1740 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-23 07:36:00,935 - orchestrator:346 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-23 07:36:00,935 - orchestrator:350 - INFO - Initial backend service connectivity checks passed.
+2025-04-23 07:36:25,872 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 07:36:27,788 - orchestrator:386 - INFO - Received /assist request for file: recording-1745393787784.wav
+2025-04-23 07:36:27,788 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 07:36:28,138 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 07:36:28,139 - orchestrator:150 - INFO - ASR Response: 'Test scene, test scene....'
+2025-04-23 07:36:28,139 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 07:36:28,519 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 07:36:28,520 - orchestrator:177 - INFO - LLM Response: 'I'm ready to test. Go ahead and ask me a question or start a conversation....'
+2025-04-23 07:36:28,520 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 4e9f8281-e7bf-4ae0-892f-6c1c27bd2f7b
+2025-04-23 07:36:28,520 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'I'm ready to test. Go ahead and ask me a question ...'
+2025-04-23 07:36:28,535 - orchestrator:203 - INFO - TTS WebSocket connection established for 4e9f8281-e7bf-4ae0-892f-6c1c27bd2f7b.
+2025-04-23 07:36:28,535 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 4e9f8281-e7bf-4ae0-892f-6c1c27bd2f7b.
+2025-04-23 07:36:28,636 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 4e9f8281-e7bf-4ae0-892f-6c1c27bd2f7b: TTS input error: too many values to unpack (expected 2)
+2025-04-23 07:36:28,637 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: TTS input error: too many values to unpack (expected 2)
+2025-04-23 08:02:48,678 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 08:02:50,692 - orchestrator:386 - INFO - Received /assist request for file: recording-1745395370642.wav
+2025-04-23 08:02:50,693 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 08:02:51,310 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 08:02:51,311 - orchestrator:150 - INFO - ASR Response: 'Let's see, let's see....'
+2025-04-23 08:02:51,311 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 08:02:52,952 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 08:02:52,953 - orchestrator:177 - INFO - LLM Response: 'You're ready to start. I'll get us going. What's on your mind? Want to plan a trip, get some recomme...'
+2025-04-23 08:02:52,953 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 40d8bbc5-c879-4ad6-b792-12c00533da07
+2025-04-23 08:02:52,953 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'You're ready to start. I'll get us going. What's o...'
+2025-04-23 08:02:52,985 - orchestrator:203 - INFO - TTS WebSocket connection established for 40d8bbc5-c879-4ad6-b792-12c00533da07.
+2025-04-23 08:02:52,986 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 40d8bbc5-c879-4ad6-b792-12c00533da07.
+2025-04-23 08:02:52,988 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 40d8bbc5-c879-4ad6-b792-12c00533da07: TTS service unavailable: Model loading failed: Error(s) in loading state_dict for Model:
+	Missing key(s) in state_dict: "backbone.tok_embeddings.weight", "decoder.tok_embeddings.weight", "csm_text_embeddings.weight", "csm_audio_embeddings.weight". 
+	Unexpected key(s) in state_dict: "audio_embeddings.weight", "text_embeddings.weight". 
+2025-04-23 08:02:52,988 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: TTS service unavailable: Model loading failed: Error(s) in loading state_dict for Model:
+	Missing key(s) in state_dict: "backbone.tok_embeddings.weight", "decoder.tok_embeddings.weight", "csm_text_embeddings.weight", "csm_audio_embeddings.weight". 
+	Unexpected key(s) in state_dict: "audio_embeddings.weight", "text_embeddings.weight". 
+2025-04-23 08:03:12,493 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 08:03:15,670 - orchestrator:386 - INFO - Received /assist request for file: recording-1745395395666.wav
+2025-04-23 08:03:15,670 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 08:03:15,801 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 08:03:15,802 - orchestrator:149 - WARNING - ASR returned an empty transcript.
+2025-04-23 08:03:15,802 - orchestrator:396 - INFO - ASR returned no transcript. Generating no-speech response.
+2025-04-23 08:03:15,802 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: f100c9ae-c2b9-47fd-ad68-267823c5c229
+2025-04-23 08:03:15,802 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'Sorry, I didn't hear anything....'
+2025-04-23 08:03:15,805 - orchestrator:203 - INFO - TTS WebSocket connection established for f100c9ae-c2b9-47fd-ad68-267823c5c229.
+2025-04-23 08:03:15,805 - orchestrator:288 - ERROR - TTS WebSocket connection failed to ws://tts:5003/synthesize_stream: received 1011 (internal error); then sent 1011 (internal error)
+2025-04-23 08:03:15,806 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - Failed to connect to TTS service: received 1011 (internal error); then sent 1011 (internal error)
+2025-04-23 08:10:06,105 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 08:10:07,825 - orchestrator:386 - INFO - Received /assist request for file: recording-1745395807773.wav
+2025-04-23 08:10:07,826 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 08:10:08,334 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 08:10:08,335 - orchestrator:150 - INFO - ASR Response: 'testing testing...'
+2025-04-23 08:10:08,335 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 08:10:09,948 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 08:10:09,950 - orchestrator:177 - INFO - LLM Response: 'It looks like you're testing some things, I see. How can I help you today? Do you need assistance wi...'
+2025-04-23 08:10:09,950 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 348dcbd6-0381-4e03-8e16-2f62618538a7
+2025-04-23 08:10:09,950 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'It looks like you're testing some things, I see. H...'
+2025-04-23 08:10:09,957 - orchestrator:203 - INFO - TTS WebSocket connection established for 348dcbd6-0381-4e03-8e16-2f62618538a7.
+2025-04-23 08:10:09,957 - orchestrator:288 - ERROR - TTS WebSocket connection failed to ws://tts:5003/synthesize_stream: received 1011 (internal error); then sent 1011 (internal error)
+2025-04-23 08:10:09,958 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - Failed to connect to TTS service: received 1011 (internal error); then sent 1011 (internal error)
+2025-04-23 08:49:34,001 - orchestrator:313 - INFO - ORCHESTRATOR Service starting up...
+2025-04-23 08:49:34,002 - orchestrator:75 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 08:49:34,006 - orchestrator:108 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-23 08:49:34,006 - orchestrator:109 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-23 08:49:34,006 - orchestrator:110 - INFO - TTS WebSocket Endpoint: ws://tts:5003/synthesize_stream
+2025-04-23 08:49:34,007 - orchestrator:115 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-23 08:49:34,007 - orchestrator:121 - INFO - Loaded system prompt from config.
+2025-04-23 08:49:34,042 - orchestrator:319 - INFO - HTTP client initialized.
+2025-04-23 08:49:39,048 - orchestrator:336 - INFO - Checking backend service connectivity...
+2025-04-23 08:49:39,055 - httpx:1740 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-23 08:49:39,055 - orchestrator:346 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-23 08:49:39,058 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-23 08:49:39,059 - orchestrator:346 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-23 08:49:39,061 - httpx:1740 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-23 08:49:39,062 - orchestrator:346 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-23 08:49:39,062 - orchestrator:350 - INFO - Initial backend service connectivity checks passed.
+2025-04-23 08:51:00,126 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 08:51:02,284 - orchestrator:386 - INFO - Received /assist request for file: recording-1745398262232.wav
+2025-04-23 08:51:02,284 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 08:51:03,300 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 08:51:03,300 - orchestrator:150 - INFO - ASR Response: 'Testing, testing....'
+2025-04-23 08:51:03,300 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 08:51:03,954 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 08:51:03,955 - orchestrator:177 - INFO - LLM Response: 'Hello! How can I assist you today?...'
+2025-04-23 08:51:03,955 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 3cb5f4aa-586d-41d9-9174-479c47c005c7
+2025-04-23 08:51:03,955 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'Hello! How can I assist you today?...'
+2025-04-23 08:51:03,981 - orchestrator:203 - INFO - TTS WebSocket connection established for 3cb5f4aa-586d-41d9-9174-479c47c005c7.
+2025-04-23 08:51:03,982 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 3cb5f4aa-586d-41d9-9174-479c47c005c7.
+2025-04-23 08:51:04,144 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 3cb5f4aa-586d-41d9-9174-479c47c005c7: Unexpected TTS generation error: 
+2025-04-23 08:51:04,145 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: Unexpected TTS generation error: 
+2025-04-23 08:52:34,692 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 08:52:35,869 - orchestrator:386 - INFO - Received /assist request for file: recording-1745398355822.wav
+2025-04-23 08:52:35,870 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 08:52:35,989 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 08:52:35,990 - orchestrator:149 - WARNING - ASR returned an empty transcript.
+2025-04-23 08:52:35,990 - orchestrator:396 - INFO - ASR returned no transcript. Generating no-speech response.
+2025-04-23 08:52:35,991 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 6e88c1dc-1f6a-4256-bb98-7ddb1ab68f53
+2025-04-23 08:52:35,991 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'Sorry, I didn't hear anything....'
+2025-04-23 08:52:35,994 - orchestrator:203 - INFO - TTS WebSocket connection established for 6e88c1dc-1f6a-4256-bb98-7ddb1ab68f53.
+2025-04-23 08:52:35,995 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 6e88c1dc-1f6a-4256-bb98-7ddb1ab68f53.
+2025-04-23 08:52:36,044 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 6e88c1dc-1f6a-4256-bb98-7ddb1ab68f53: Unexpected TTS generation error: 
+2025-04-23 08:52:36,046 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: Unexpected TTS generation error: 
+2025-04-23 08:54:29,976 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 08:54:32,073 - orchestrator:386 - INFO - Received /assist request for file: recording-1745398472070.wav
+2025-04-23 08:54:32,074 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 08:54:32,216 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 08:54:32,219 - orchestrator:149 - WARNING - ASR returned an empty transcript.
+2025-04-23 08:54:32,223 - orchestrator:396 - INFO - ASR returned no transcript. Generating no-speech response.
+2025-04-23 08:54:32,225 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 6d9862ab-48e3-4b20-a217-23891d357b3d
+2025-04-23 08:54:32,226 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'Sorry, I didn't hear anything....'
+2025-04-23 08:54:32,230 - orchestrator:203 - INFO - TTS WebSocket connection established for 6d9862ab-48e3-4b20-a217-23891d357b3d.
+2025-04-23 08:54:32,231 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 6d9862ab-48e3-4b20-a217-23891d357b3d.
+2025-04-23 08:54:32,277 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 6d9862ab-48e3-4b20-a217-23891d357b3d: Unexpected TTS generation error: 
+2025-04-23 08:54:32,278 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: Unexpected TTS generation error: 
+2025-04-23 09:20:13,084 - orchestrator:313 - INFO - ORCHESTRATOR Service starting up...
+2025-04-23 09:20:13,084 - orchestrator:75 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 09:20:13,088 - orchestrator:108 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-23 09:20:13,088 - orchestrator:109 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-23 09:20:13,089 - orchestrator:110 - INFO - TTS WebSocket Endpoint: ws://tts:5003/synthesize_stream
+2025-04-23 09:20:13,089 - orchestrator:115 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-23 09:20:13,089 - orchestrator:121 - INFO - Loaded system prompt from config.
+2025-04-23 09:20:13,126 - orchestrator:319 - INFO - HTTP client initialized.
+2025-04-23 09:20:18,131 - orchestrator:336 - INFO - Checking backend service connectivity...
+2025-04-23 09:20:18,141 - httpx:1740 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-23 09:20:18,141 - orchestrator:346 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-23 09:20:18,157 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-23 09:20:18,158 - orchestrator:346 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-23 09:20:18,160 - httpx:1740 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-23 09:20:18,161 - orchestrator:346 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-23 09:20:18,161 - orchestrator:350 - INFO - Initial backend service connectivity checks passed.
+2025-04-23 09:23:18,960 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 09:23:21,643 - orchestrator:386 - INFO - Received /assist request for file: recording-1745400201639.wav
+2025-04-23 09:23:21,643 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 09:23:23,031 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 09:23:23,032 - orchestrator:150 - INFO - ASR Response: 'Testing, testing....'
+2025-04-23 09:23:23,032 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 09:23:23,908 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 09:23:23,909 - orchestrator:177 - INFO - LLM Response: 'It seems like you're checking to see if everything is working as expected. That's great! How can I a...'
+2025-04-23 09:23:23,909 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 248361a5-e698-47c3-9048-2ecf472dc6b1
+2025-04-23 09:23:23,909 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'It seems like you're checking to see if everything...'
+2025-04-23 09:23:23,952 - orchestrator:203 - INFO - TTS WebSocket connection established for 248361a5-e698-47c3-9048-2ecf472dc6b1.
+2025-04-23 09:23:23,952 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 248361a5-e698-47c3-9048-2ecf472dc6b1.
+2025-04-23 09:23:24,146 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 248361a5-e698-47c3-9048-2ecf472dc6b1: Unexpected TTS generation error: 
+2025-04-23 09:23:24,147 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: Unexpected TTS generation error: 
+2025-04-23 10:43:04,398 - orchestrator:313 - INFO - ORCHESTRATOR Service starting up...
+2025-04-23 10:43:04,398 - orchestrator:75 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 10:43:04,403 - orchestrator:108 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-23 10:43:04,403 - orchestrator:109 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-23 10:43:04,403 - orchestrator:110 - INFO - TTS WebSocket Endpoint: ws://tts:5003/synthesize_stream
+2025-04-23 10:43:04,403 - orchestrator:115 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-23 10:43:04,403 - orchestrator:121 - INFO - Loaded system prompt from config.
+2025-04-23 10:43:04,439 - orchestrator:319 - INFO - HTTP client initialized.
+2025-04-23 10:43:09,444 - orchestrator:336 - INFO - Checking backend service connectivity...
+2025-04-23 10:43:09,453 - httpx:1740 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-23 10:43:09,453 - orchestrator:346 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-23 10:43:09,456 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-23 10:43:09,456 - orchestrator:346 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-23 10:43:09,458 - httpx:1740 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-23 10:43:09,458 - orchestrator:346 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-23 10:43:09,458 - orchestrator:350 - INFO - Initial backend service connectivity checks passed.
+2025-04-23 10:48:18,264 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 10:48:20,601 - orchestrator:386 - INFO - Received /assist request for file: recording-1745405300597.wav
+2025-04-23 10:48:20,601 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 10:48:22,957 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 10:48:22,957 - orchestrator:150 - INFO - ASR Response: 'testing testing...'
+2025-04-23 10:48:22,957 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 10:48:24,947 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 10:48:24,948 - orchestrator:177 - INFO - LLM Response: 'It looks like your test message sent a little too far! Don't worry, I'm here to help. How can I assi...'
+2025-04-23 10:48:24,948 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: a4de4b69-20cd-4920-8039-9dba6a7c76b4
+2025-04-23 10:48:24,948 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'It looks like your test message sent a little too ...'
+2025-04-23 10:48:24,955 - orchestrator:203 - INFO - TTS WebSocket connection established for a4de4b69-20cd-4920-8039-9dba6a7c76b4.
+2025-04-23 10:48:24,956 - orchestrator:211 - INFO - Sent 'generate_chunk' request for a4de4b69-20cd-4920-8039-9dba6a7c76b4.
+2025-04-23 10:48:25,125 - orchestrator:235 - ERROR - Received error from TTS WebSocket for a4de4b69-20cd-4920-8039-9dba6a7c76b4: Unexpected TTS generation error: 
+2025-04-23 10:48:25,126 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: Unexpected TTS generation error: 
+2025-04-23 11:01:23,041 - orchestrator:313 - INFO - ORCHESTRATOR Service starting up...
+2025-04-23 11:01:23,041 - orchestrator:75 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 11:01:23,045 - orchestrator:108 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-23 11:01:23,045 - orchestrator:109 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-23 11:01:23,046 - orchestrator:110 - INFO - TTS WebSocket Endpoint: ws://tts:5003/synthesize_stream
+2025-04-23 11:01:23,046 - orchestrator:115 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-23 11:01:23,046 - orchestrator:121 - INFO - Loaded system prompt from config.
+2025-04-23 11:01:23,080 - orchestrator:319 - INFO - HTTP client initialized.
+2025-04-23 11:01:28,084 - orchestrator:336 - INFO - Checking backend service connectivity...
+2025-04-23 11:01:28,096 - httpx:1740 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-23 11:01:28,097 - orchestrator:346 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-23 11:01:28,099 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-23 11:01:28,099 - orchestrator:346 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-23 11:01:28,101 - httpx:1740 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-23 11:01:28,102 - orchestrator:346 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-23 11:01:28,102 - orchestrator:350 - INFO - Initial backend service connectivity checks passed.
+2025-04-23 11:09:20,221 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 11:09:22,220 - orchestrator:386 - INFO - Received /assist request for file: recording-1745406562169.wav
+2025-04-23 11:09:22,220 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 11:09:22,789 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 11:09:22,789 - orchestrator:150 - INFO - ASR Response: 'Testing, testing....'
+2025-04-23 11:09:22,789 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 11:09:23,549 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 11:09:23,550 - orchestrator:177 - INFO - LLM Response: 'I'm ready when you are. What's on your mind?...'
+2025-04-23 11:09:23,550 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: ceb99cb3-2377-4a69-a645-665042997b6e
+2025-04-23 11:09:23,550 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'I'm ready when you are. What's on your mind?...'
+2025-04-23 11:09:23,559 - orchestrator:203 - INFO - TTS WebSocket connection established for ceb99cb3-2377-4a69-a645-665042997b6e.
+2025-04-23 11:09:23,559 - orchestrator:211 - INFO - Sent 'generate_chunk' request for ceb99cb3-2377-4a69-a645-665042997b6e.
+2025-04-23 11:09:23,776 - orchestrator:235 - ERROR - Received error from TTS WebSocket for ceb99cb3-2377-4a69-a645-665042997b6e: TTS runtime error: shape mismatch: value tensor of shape [32, 1, 64] cannot be broadcast to indexing result of shape [1, 32, 1, 1, 64]
+2025-04-23 11:09:23,777 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: TTS runtime error: shape mismatch: value tensor of shape [32, 1, 64] cannot be broadcast to indexing result of shape [1, 32, 1, 1, 64]
+2025-04-23 11:10:19,237 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 11:10:21,336 - orchestrator:386 - INFO - Received /assist request for file: recording-1745406621288.wav
+2025-04-23 11:10:21,336 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 11:10:21,882 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 11:10:21,882 - orchestrator:150 - INFO - ASR Response: 'Test in, test in....'
+2025-04-23 11:10:21,883 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 11:10:22,122 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 11:10:22,123 - orchestrator:177 - INFO - LLM Response: 'Hello! How can I assist you today?...'
+2025-04-23 11:10:22,123 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: b92465ab-4269-44e8-bc48-1827a9b3167f
+2025-04-23 11:10:22,123 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'Hello! How can I assist you today?...'
+2025-04-23 11:10:22,126 - orchestrator:203 - INFO - TTS WebSocket connection established for b92465ab-4269-44e8-bc48-1827a9b3167f.
+2025-04-23 11:10:22,126 - orchestrator:211 - INFO - Sent 'generate_chunk' request for b92465ab-4269-44e8-bc48-1827a9b3167f.
+2025-04-23 11:10:22,142 - orchestrator:235 - ERROR - Received error from TTS WebSocket for b92465ab-4269-44e8-bc48-1827a9b3167f: TTS runtime error: shape mismatch: value tensor of shape [32, 1, 64] cannot be broadcast to indexing result of shape [1, 32, 1, 1, 64]
+2025-04-23 11:10:22,143 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: TTS runtime error: shape mismatch: value tensor of shape [32, 1, 64] cannot be broadcast to indexing result of shape [1, 32, 1, 1, 64]
+2025-04-23 11:27:45,017 - orchestrator:313 - INFO - ORCHESTRATOR Service starting up...
+2025-04-23 11:27:45,018 - orchestrator:75 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 11:27:45,022 - orchestrator:108 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-23 11:27:45,022 - orchestrator:109 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-23 11:27:45,023 - orchestrator:110 - INFO - TTS WebSocket Endpoint: ws://tts:5003/synthesize_stream
+2025-04-23 11:27:45,023 - orchestrator:115 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-23 11:27:45,023 - orchestrator:121 - INFO - Loaded system prompt from config.
+2025-04-23 11:27:45,057 - orchestrator:319 - INFO - HTTP client initialized.
+2025-04-23 11:27:50,062 - orchestrator:336 - INFO - Checking backend service connectivity...
+2025-04-23 11:27:50,072 - httpx:1740 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-23 11:27:50,072 - orchestrator:346 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-23 11:27:50,074 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-23 11:27:50,074 - orchestrator:346 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-23 11:27:50,076 - httpx:1740 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-23 11:27:50,077 - orchestrator:346 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-23 11:27:50,078 - orchestrator:350 - INFO - Initial backend service connectivity checks passed.
+2025-04-23 12:30:48,046 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 12:30:51,070 - orchestrator:386 - INFO - Received /assist request for file: recording-1745411451055.wav
+2025-04-23 12:30:51,071 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 12:30:52,109 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 12:30:52,110 - orchestrator:150 - INFO - ASR Response: 'Test soon, test soon....'
+2025-04-23 12:30:52,110 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 12:30:53,313 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 12:30:53,314 - orchestrator:177 - INFO - LLM Response: 'I'll be here waiting for you when you're ready. Do you have any questions or need help with anything...'
+2025-04-23 12:30:53,314 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 90581321-8bfb-48bb-a8ef-6e0ba78f4f58
+2025-04-23 12:30:53,315 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'I'll be here waiting for you when you're ready. Do...'
+2025-04-23 12:31:01,277 - orchestrator:293 - ERROR - Unexpected error calling TTS via WebSocket: [Errno -2] Name or service not known
+Traceback (most recent call last):
+  File "/app/orchestrator.py", line 202, in call_tts_service_ws
+    async with websockets.connect(ws_url, open_timeout=20, close_timeout=10) as websocket:
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/client.py", line 587, in __aenter__
+    return await self
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/client.py", line 541, in __await_impl__
+    self.connection = await self.create_connection()
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/client.py", line 467, in create_connection
+    _, connection = await loop.create_connection(factory, **kwargs)
+  File "uvloop/loop.pyx", line 1982, in create_connection
+socket.gaierror: [Errno -2] Name or service not known
+2025-04-23 12:31:01,289 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 500 - Internal error communicating with TTS: [Errno -2] Name or service not known
+2025-04-23 12:35:35,765 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 12:35:37,919 - orchestrator:386 - INFO - Received /assist request for file: recording-1745411737868.wav
+2025-04-23 12:35:37,919 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 12:35:38,266 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 12:35:38,266 - orchestrator:150 - INFO - ASR Response: 'Testing, testing....'
+2025-04-23 12:35:38,267 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 12:35:38,504 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 12:35:38,505 - orchestrator:177 - INFO - LLM Response: 'Hello! How can I assist you today?...'
+2025-04-23 12:35:38,505 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: ea834428-40a5-4860-a786-19eff43fcd75
+2025-04-23 12:35:38,506 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'Hello! How can I assist you today?...'
+2025-04-23 12:35:42,466 - orchestrator:293 - ERROR - Unexpected error calling TTS via WebSocket: [Errno -2] Name or service not known
+Traceback (most recent call last):
+  File "/app/orchestrator.py", line 202, in call_tts_service_ws
+    async with websockets.connect(ws_url, open_timeout=20, close_timeout=10) as websocket:
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/client.py", line 587, in __aenter__
+    return await self
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/client.py", line 541, in __await_impl__
+    self.connection = await self.create_connection()
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/client.py", line 467, in create_connection
+    _, connection = await loop.create_connection(factory, **kwargs)
+  File "uvloop/loop.pyx", line 1982, in create_connection
+socket.gaierror: [Errno -2] Name or service not known
+2025-04-23 12:35:42,467 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 500 - Internal error communicating with TTS: [Errno -2] Name or service not known
+2025-04-23 13:40:00,670 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 13:40:02,642 - orchestrator:386 - INFO - Received /assist request for file: recording-1745415602629.wav
+2025-04-23 13:40:02,642 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 13:40:03,428 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 13:40:03,429 - orchestrator:150 - INFO - ASR Response: 'Testing, testing....'
+2025-04-23 13:40:03,429 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 13:40:04,514 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 13:40:04,514 - orchestrator:177 - INFO - LLM Response: '*beep* I'm ready to assist. How can I help you today?...'
+2025-04-23 13:40:04,515 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 85df2333-6bcd-4e63-81bb-9f1102950856
+2025-04-23 13:40:04,515 - orchestrator:196 - INFO - Sending text to TTS service via WS: '*beep* I'm ready to assist. How can I help you tod...'
+2025-04-23 13:40:04,530 - orchestrator:203 - INFO - TTS WebSocket connection established for 85df2333-6bcd-4e63-81bb-9f1102950856.
+2025-04-23 13:40:04,532 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 85df2333-6bcd-4e63-81bb-9f1102950856.
+2025-04-23 13:40:04,738 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 85df2333-6bcd-4e63-81bb-9f1102950856: Unexpected TTS generation error: 'KVCache' object has no attribute 'is_enabled'
+2025-04-23 13:40:04,741 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: Unexpected TTS generation error: 'KVCache' object has no attribute 'is_enabled'
+2025-04-23 13:53:39,382 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 13:53:41,850 - orchestrator:386 - INFO - Received /assist request for file: recording-1745416421836.wav
+2025-04-23 13:53:41,850 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 13:53:42,651 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 13:53:42,652 - orchestrator:150 - INFO - ASR Response: 'Test in, test in....'
+2025-04-23 13:53:42,652 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 13:53:43,541 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 13:53:43,542 - orchestrator:177 - INFO - LLM Response: '*static* Hello? You have an emergency or just want to test my skills?...'
+2025-04-23 13:53:43,542 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: fc5930ce-5d3f-4d00-8337-0e143103ffc9
+2025-04-23 13:53:43,542 - orchestrator:196 - INFO - Sending text to TTS service via WS: '*static* Hello? You have an emergency or just want...'
+2025-04-23 13:53:43,548 - orchestrator:203 - INFO - TTS WebSocket connection established for fc5930ce-5d3f-4d00-8337-0e143103ffc9.
+2025-04-23 13:53:43,548 - orchestrator:211 - INFO - Sent 'generate_chunk' request for fc5930ce-5d3f-4d00-8337-0e143103ffc9.
+2025-04-23 13:53:43,807 - orchestrator:235 - ERROR - Received error from TTS WebSocket for fc5930ce-5d3f-4d00-8337-0e143103ffc9: TTS runtime error: Error in backbone layer 0
+2025-04-23 13:53:43,808 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: TTS runtime error: Error in backbone layer 0
+2025-04-23 14:20:26,003 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 14:20:29,196 - orchestrator:386 - INFO - Received /assist request for file: recording-1745418029182.wav
+2025-04-23 14:20:29,196 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 14:20:30,353 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 14:20:30,354 - orchestrator:150 - INFO - ASR Response: 'test him test him...'
+2025-04-23 14:20:30,354 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 14:20:32,032 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 14:20:32,033 - orchestrator:177 - INFO - LLM Response: 'I'm ready to put him through his paces! Go ahead, ask me a question or make a request. I'll do my be...'
+2025-04-23 14:20:32,033 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 0841c0de-f2a5-4c06-ae5d-e7031a11a51c
+2025-04-23 14:20:32,033 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'I'm ready to put him through his paces! Go ahead, ...'
+2025-04-23 14:20:32,038 - orchestrator:203 - INFO - TTS WebSocket connection established for 0841c0de-f2a5-4c06-ae5d-e7031a11a51c.
+2025-04-23 14:20:32,039 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 0841c0de-f2a5-4c06-ae5d-e7031a11a51c.
+2025-04-23 14:20:32,210 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 0841c0de-f2a5-4c06-ae5d-e7031a11a51c: TTS runtime error: Error in backbone layer 0
+2025-04-23 14:20:32,211 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: TTS runtime error: Error in backbone layer 0
+2025-04-23 14:38:36,989 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 14:38:39,458 - orchestrator:386 - INFO - Received /assist request for file: recording-1745419119447.wav
+2025-04-23 14:38:39,459 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 14:38:40,336 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 14:38:40,337 - orchestrator:150 - INFO - ASR Response: 'Testing, testing....'
+2025-04-23 14:38:40,337 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 14:38:41,539 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 14:38:41,540 - orchestrator:177 - INFO - LLM Response: 'That sounds like a fun phrase. I've heard it before in movies, but I'm not sure if it's a real thing...'
+2025-04-23 14:38:41,541 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 24a5f2b6-66e0-4a94-a5b1-d0d3fa0a7213
+2025-04-23 14:38:41,542 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'That sounds like a fun phrase. I've heard it befor...'
+2025-04-23 14:38:41,550 - orchestrator:203 - INFO - TTS WebSocket connection established for 24a5f2b6-66e0-4a94-a5b1-d0d3fa0a7213.
+2025-04-23 14:38:41,551 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 24a5f2b6-66e0-4a94-a5b1-d0d3fa0a7213.
+2025-04-23 14:38:41,715 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 24a5f2b6-66e0-4a94-a5b1-d0d3fa0a7213: TTS runtime error: Error in backbone layer 0
+2025-04-23 14:38:41,718 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: TTS runtime error: Error in backbone layer 0
+2025-04-23 15:03:15,780 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 15:03:20,130 - orchestrator:386 - INFO - Received /assist request for file: recording-1745420600108.wav
+2025-04-23 15:03:20,131 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 15:03:21,143 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 15:03:21,144 - orchestrator:150 - INFO - ASR Response: 'Testing. Testing. 1, 2, 3....'
+2025-04-23 15:03:21,145 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 15:03:21,932 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 15:03:21,933 - orchestrator:177 - INFO - LLM Response: 'How can I assist you today?...'
+2025-04-23 15:03:21,933 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 396d6456-fac1-4584-b92b-abe13b1173ca
+2025-04-23 15:03:21,934 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'How can I assist you today?...'
+2025-04-23 15:03:21,945 - orchestrator:203 - INFO - TTS WebSocket connection established for 396d6456-fac1-4584-b92b-abe13b1173ca.
+2025-04-23 15:03:21,946 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 396d6456-fac1-4584-b92b-abe13b1173ca.
+2025-04-23 15:03:22,199 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 396d6456-fac1-4584-b92b-abe13b1173ca: TTS runtime error: Error in decoder layer 0 during priming step 1
+2025-04-23 15:03:22,202 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: TTS runtime error: Error in decoder layer 0 during priming step 1
+2025-04-23 15:20:28,779 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 15:20:32,252 - orchestrator:386 - INFO - Received /assist request for file: recording-1745421632244.wav
+2025-04-23 15:20:32,252 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 15:20:33,226 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 15:20:33,226 - orchestrator:150 - INFO - ASR Response: 'To a scene, to a scene.  One, two, three....'
+2025-04-23 15:20:33,227 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 15:20:34,265 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 15:20:34,265 - orchestrator:177 - INFO - LLM Response: 'The iconic opening line! "To a scene, to a scene, to a scene..."...'
+2025-04-23 15:20:34,266 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 030f7d17-6b31-4ac6-8f30-1a34a53ced0d
+2025-04-23 15:20:34,266 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'The iconic opening line! "To a scene, to a scene, ...'
+2025-04-23 15:20:34,271 - orchestrator:203 - INFO - TTS WebSocket connection established for 030f7d17-6b31-4ac6-8f30-1a34a53ced0d.
+2025-04-23 15:20:34,272 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 030f7d17-6b31-4ac6-8f30-1a34a53ced0d.
+2025-04-23 15:20:34,666 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 030f7d17-6b31-4ac6-8f30-1a34a53ced0d: TTS runtime error: Error in backbone layer 0
+2025-04-23 15:20:34,668 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: TTS runtime error: Error in backbone layer 0
+2025-04-23 15:36:54,268 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 15:36:56,868 - orchestrator:386 - INFO - Received /assist request for file: recording-1745422616858.wav
+2025-04-23 15:36:56,868 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 15:36:57,428 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 15:36:57,429 - orchestrator:150 - INFO - ASR Response: 'Testing, testing....'
+2025-04-23 15:36:57,429 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 15:36:58,566 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 15:36:58,566 - orchestrator:177 - INFO - LLM Response: 'I'm here to help. What's on your mind?...'
+2025-04-23 15:36:58,567 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 015c57b2-d0bc-42ea-8e27-77fe808e683a
+2025-04-23 15:36:58,567 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'I'm here to help. What's on your mind?...'
+2025-04-23 15:36:58,572 - orchestrator:203 - INFO - TTS WebSocket connection established for 015c57b2-d0bc-42ea-8e27-77fe808e683a.
+2025-04-23 15:36:58,572 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 015c57b2-d0bc-42ea-8e27-77fe808e683a.
+2025-04-23 15:37:43,572 - orchestrator:253 - ERROR - TTS WebSocket receive timed out after 45.0s for 015c57b2-d0bc-42ea-8e27-77fe808e683a with NO audio received.
+2025-04-23 15:37:48,576 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 504 - TTS service timed out waiting for audio.
+2025-04-23 15:43:12,479 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 15:43:15,131 - orchestrator:386 - INFO - Received /assist request for file: recording-1745422995128.wav
+2025-04-23 15:43:15,131 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 15:43:15,710 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 15:43:15,711 - orchestrator:150 - INFO - ASR Response: 'Toast toon, toast toon....'
+2025-04-23 15:43:15,711 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 15:43:16,214 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 15:43:16,215 - orchestrator:177 - INFO - LLM Response: '"Toast toon, toast toon, it's time for breakfast! What can I get for you today?"...'
+2025-04-23 15:43:16,215 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 505727cd-19ec-40c8-bed0-99560c8e12cb
+2025-04-23 15:43:16,215 - orchestrator:196 - INFO - Sending text to TTS service via WS: '"Toast toon, toast toon, it's time for breakfast! ...'
+2025-04-23 15:43:16,218 - orchestrator:203 - INFO - TTS WebSocket connection established for 505727cd-19ec-40c8-bed0-99560c8e12cb.
+2025-04-23 15:43:16,218 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 505727cd-19ec-40c8-bed0-99560c8e12cb.
+2025-04-23 15:44:01,216 - orchestrator:253 - ERROR - TTS WebSocket receive timed out after 45.0s for 505727cd-19ec-40c8-bed0-99560c8e12cb with NO audio received.
+2025-04-23 15:44:06,219 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 504 - TTS service timed out waiting for audio.
+2025-04-23 15:44:45,841 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 15:44:48,937 - orchestrator:386 - INFO - Received /assist request for file: recording-1745423088934.wav
+2025-04-23 15:44:48,938 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 15:44:49,460 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 15:44:49,461 - orchestrator:150 - INFO - ASR Response: 'Testing, testing, one, two, three....'
+2025-04-23 15:44:49,461 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 15:44:52,970 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 15:44:52,971 - orchestrator:177 - INFO - LLM Response: 'Howdy! Welcome to our little chat. What's on your mind today?...'
+2025-04-23 15:44:52,971 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: ad37a1fc-f709-4ce2-a677-fe38d6aa33b6
+2025-04-23 15:44:52,971 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'Howdy! Welcome to our little chat. What's on your ...'
+2025-04-23 15:45:12,971 - orchestrator:293 - ERROR - Unexpected error calling TTS via WebSocket: timed out during opening handshake
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/client.py", line 543, in __await_impl__
+    await self.connection.handshake(
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/client.py", line 104, in handshake
+    await asyncio.wait(
+  File "/usr/local/lib/python3.10/asyncio/tasks.py", line 384, in wait
+    return await _wait(fs, timeout, return_when, loop)
+  File "/usr/local/lib/python3.10/asyncio/tasks.py", line 491, in _wait
+    await waiter
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/client.py", line 539, in __await_impl__
+    async with asyncio_timeout(self.open_timeout):
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/async_timeout.py", line 181, in __aexit__
+    self._do_exit(exc_type)
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/async_timeout.py", line 268, in _do_exit
+    raise asyncio.TimeoutError
+asyncio.exceptions.TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/orchestrator.py", line 202, in call_tts_service_ws
+    async with websockets.connect(ws_url, open_timeout=20, close_timeout=10) as websocket:
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/client.py", line 587, in __aenter__
+    return await self
+  File "/app/.venv/lib/python3.10/site-packages/websockets/asyncio/client.py", line 578, in __await_impl__
+    raise TimeoutError("timed out during opening handshake") from exc
+asyncio.exceptions.TimeoutError: timed out during opening handshake
+2025-04-23 15:45:12,980 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 500 - Internal error communicating with TTS: timed out during opening handshake
+2025-04-23 15:47:35,985 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 16:00:25,530 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 16:00:27,609 - orchestrator:386 - INFO - Received /assist request for file: recording-1745424027566.wav
+2025-04-23 16:00:27,609 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 16:00:28,092 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 16:00:28,092 - orchestrator:150 - INFO - ASR Response: 'Test scene, test scene....'
+2025-04-23 16:00:28,093 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 16:00:28,939 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 16:00:28,940 - orchestrator:177 - INFO - LLM Response: 'I'm ready to test the system. Go ahead and ask me a question, and I'll respond as Astra....'
+2025-04-23 16:00:28,940 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 299bf507-019b-4e41-a550-88c3956230cf
+2025-04-23 16:00:28,940 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'I'm ready to test the system. Go ahead and ask me ...'
+2025-04-23 16:00:28,944 - orchestrator:203 - INFO - TTS WebSocket connection established for 299bf507-019b-4e41-a550-88c3956230cf.
+2025-04-23 16:00:28,945 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 299bf507-019b-4e41-a550-88c3956230cf.
+2025-04-23 16:01:13,944 - orchestrator:253 - ERROR - TTS WebSocket receive timed out after 45.0s for 299bf507-019b-4e41-a550-88c3956230cf with NO audio received.
+2025-04-23 16:01:18,944 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 504 - TTS service timed out waiting for audio.
+2025-04-23 16:07:40,691 - orchestrator:313 - INFO - ORCHESTRATOR Service starting up...
+2025-04-23 16:07:40,691 - orchestrator:75 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 16:07:40,698 - orchestrator:108 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-23 16:07:40,699 - orchestrator:109 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-23 16:07:40,701 - orchestrator:110 - INFO - TTS WebSocket Endpoint: ws://tts:5003/synthesize_stream
+2025-04-23 16:07:40,702 - orchestrator:115 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-23 16:07:40,703 - orchestrator:121 - INFO - Loaded system prompt from config.
+2025-04-23 16:07:40,745 - orchestrator:319 - INFO - HTTP client initialized.
+2025-04-23 16:07:45,751 - orchestrator:336 - INFO - Checking backend service connectivity...
+2025-04-23 16:07:45,759 - httpx:1740 - INFO - HTTP Request: GET http://asr:5001/health "HTTP/1.1 200 OK"
+2025-04-23 16:07:45,760 - orchestrator:346 - INFO - Backend service ASR health check successful (Status 200). URL: http://asr:5001/health
+2025-04-23 16:07:45,762 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-23 16:07:45,763 - orchestrator:346 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-23 16:07:45,765 - httpx:1740 - INFO - HTTP Request: GET http://tts:5003/health "HTTP/1.1 200 OK"
+2025-04-23 16:07:45,766 - orchestrator:346 - INFO - Backend service TTS health check successful (Status 200). URL: http://tts:5003/health
+2025-04-23 16:07:45,768 - orchestrator:350 - INFO - Initial backend service connectivity checks passed.
+2025-04-23 16:08:00,688 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 16:08:03,211 - orchestrator:386 - INFO - Received /assist request for file: recording-1745424483207.wav
+2025-04-23 16:08:03,211 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 16:08:03,573 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 16:08:03,574 - orchestrator:150 - INFO - ASR Response: 'That's it, that's it....'
+2025-04-23 16:08:03,575 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 16:08:05,373 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 16:08:05,374 - orchestrator:177 - INFO - LLM Response: 'That's a quick "that's it"! I think I get the idea that you're just here to chat, not to give me any...'
+2025-04-23 16:08:05,374 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 696f07ca-679e-4ef0-9697-a3fc74f7ad24
+2025-04-23 16:08:05,374 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'That's a quick "that's it"! I think I get the idea...'
+2025-04-23 16:08:05,379 - orchestrator:203 - INFO - TTS WebSocket connection established for 696f07ca-679e-4ef0-9697-a3fc74f7ad24.
+2025-04-23 16:08:05,380 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 696f07ca-679e-4ef0-9697-a3fc74f7ad24.
+2025-04-23 16:08:05,391 - orchestrator:235 - ERROR - Received error from TTS WebSocket for 696f07ca-679e-4ef0-9697-a3fc74f7ad24: TTS runtime error: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+2025-04-23 16:08:05,392 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 502 - TTS service error: TTS runtime error: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+2025-04-23 16:46:25,141 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-23 16:46:27,209 - orchestrator:386 - INFO - Received /assist request for file: recording-1745426787197.wav
+2025-04-23 16:46:27,210 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-23 16:46:28,186 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-23 16:46:28,187 - orchestrator:150 - INFO - ASR Response: 'Test soon, test soon....'
+2025-04-23 16:46:28,188 - orchestrator:169 - INFO - Sending 2 messages to LLM service at http://llm:5002/generate
+2025-04-23 16:46:29,645 - httpx:1740 - INFO - HTTP Request: POST http://llm:5002/generate "HTTP/1.1 200 OK"
+2025-04-23 16:46:29,646 - orchestrator:177 - INFO - LLM Response: 'I've already run some tests to ensure I'm functioning properly. Everything looks good. You can now s...'
+2025-04-23 16:46:29,646 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 342f59e5-59fe-4d51-b37d-70ba220137d9
+2025-04-23 16:46:29,647 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'I've already run some tests to ensure I'm function...'
+2025-04-23 16:46:29,654 - orchestrator:203 - INFO - TTS WebSocket connection established for 342f59e5-59fe-4d51-b37d-70ba220137d9.
+2025-04-23 16:46:29,655 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 342f59e5-59fe-4d51-b37d-70ba220137d9.
+2025-04-23 16:47:14,655 - orchestrator:253 - ERROR - TTS WebSocket receive timed out after 45.0s for 342f59e5-59fe-4d51-b37d-70ba220137d9 with NO audio received.
+2025-04-23 16:47:19,656 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 504 - TTS service timed out waiting for audio.
+2025-04-24 00:31:34,065 - orchestrator:313 - INFO - ORCHESTRATOR Service starting up...
+2025-04-24 00:31:34,066 - orchestrator:75 - INFO - Loading configuration from: /app/config.yaml
+2025-04-24 00:31:34,071 - orchestrator:108 - INFO - ASR Endpoint: http://asr:5001/transcribe
+2025-04-24 00:31:34,071 - orchestrator:109 - INFO - LLM Endpoint: http://llm:5002/generate
+2025-04-24 00:31:34,072 - orchestrator:110 - INFO - TTS WebSocket Endpoint: ws://tts:5003/synthesize_stream
+2025-04-24 00:31:34,072 - orchestrator:115 - INFO - Conversation history max length set to 10 messages (5 turns).
+2025-04-24 00:31:34,072 - orchestrator:121 - INFO - Loaded system prompt from config.
+2025-04-24 00:31:34,162 - orchestrator:319 - INFO - HTTP client initialized.
+2025-04-24 00:31:39,169 - orchestrator:336 - INFO - Checking backend service connectivity...
+2025-04-24 00:31:39,175 - orchestrator:347 - ERROR - Failed to connect to backend service ASR at http://asr:5001/health: All connection attempts failed
+2025-04-24 00:31:39,177 - httpx:1740 - INFO - HTTP Request: GET http://llm:5002/health "HTTP/1.1 200 OK"
+2025-04-24 00:31:39,178 - orchestrator:346 - INFO - Backend service LLM health check successful (Status 200). URL: http://llm:5002/health
+2025-04-24 00:31:39,179 - orchestrator:347 - ERROR - Failed to connect to backend service TTS at http://tts:5003/health: All connection attempts failed
+2025-04-24 00:31:39,179 - orchestrator:349 - ERROR - One or more critical backend services could not be reached during startup check.
+2025-04-24 00:32:52,414 - orchestrator:464 - INFO - Conversation history reset via API.
+2025-04-24 00:32:53,518 - orchestrator:386 - INFO - Received /assist request for file: recording-1745454773465.wav
+2025-04-24 00:32:53,518 - orchestrator:143 - INFO - Sending audio to ASR service at http://asr:5001/transcribe
+2025-04-24 00:32:54,173 - httpx:1740 - INFO - HTTP Request: POST http://asr:5001/transcribe "HTTP/1.1 200 OK"
+2025-04-24 00:32:54,174 - orchestrator:149 - WARNING - ASR returned an empty transcript.
+2025-04-24 00:32:54,174 - orchestrator:396 - INFO - ASR returned no transcript. Generating no-speech response.
+2025-04-24 00:32:54,174 - orchestrator:195 - INFO - Connecting to TTS WebSocket at ws://tts:5003/synthesize_stream for utterance_id: 012a4ecb-5423-48d5-bb11-0c65eee39f81
+2025-04-24 00:32:54,175 - orchestrator:196 - INFO - Sending text to TTS service via WS: 'Sorry, I didn't hear anything....'
+2025-04-24 00:32:54,184 - orchestrator:203 - INFO - TTS WebSocket connection established for 012a4ecb-5423-48d5-bb11-0c65eee39f81.
+2025-04-24 00:32:54,185 - orchestrator:211 - INFO - Sent 'generate_chunk' request for 012a4ecb-5423-48d5-bb11-0c65eee39f81.
+2025-04-24 00:33:39,181 - orchestrator:253 - ERROR - TTS WebSocket receive timed out after 45.0s for 012a4ecb-5423-48d5-bb11-0c65eee39f81 with NO audio received.
+2025-04-24 00:33:44,182 - orchestrator:443 - ERROR - Pipeline failed due to HTTPException: 504 - TTS service timed out waiting for audio.

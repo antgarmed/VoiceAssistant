@@ -1,0 +1,87 @@
+/* frontend/src/components/StatusDisplay.css */
+.status-display {
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    display: inline-flex; /* Align items horizontally */
+    align-items: center; /* Center items vertically */
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 28px; /* Ensure consistent height */
+    box-sizing: border-box;
+  }
+  
+  /* Base styles for the status indicator dot */
+  .status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0; /* Prevent dot from shrinking */
+  }
+  
+  /* Specific colors for the dot based on status */
+  .status-dot-idle {
+    background-color: #cccccc; /* Grey */
+  }
+  .status-dot-listening {
+    background-color: #f44336; /* Red */
+    /* Add animation for listening? */
+    /* animation: pulse 1.5s infinite; */
+  }
+  .status-dot-processing {
+    background-color: #ff9800; /* Orange */
+  }
+  .status-dot-speaking {
+    background-color: #4CAF50; /* Green */
+  }
+  .status-dot-error {
+    background-color: #d32f2f; /* Darker Red for error dot */
+  }
+  .status-dot-connecting { /* Example for WebSocket status */
+    background-color: #2196F3; /* Blue */
+  }
+  
+  
+  /* Styles for the main status container */
+  .status-idle {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+  .status-listening {
+    background-color: #ffebee; /* Light Red */
+    color: #b71c1c; /* Dark Red */
+  }
+  .status-processing {
+    background-color: #fff3e0; /* Light Orange */
+    color: #e65100; /* Dark Orange */
+  }
+  .status-speaking {
+    background-color: #e8f5e9; /* Light Green */
+    color: #1b5e20; /* Dark Green */
+  }
+  .status-error {
+    background-color: #ffcdd2; /* Light error Red */
+    color: #c62828; /* Dark error Red */
+  }
+  .status-connecting { /* Example for WebSocket status */
+     background-color: #e3f2fd; /* Light Blue */
+     color: #0d47a1; /* Dark Blue */
+  }
+  
+  
+  .error-message {
+      /* Style inherited from .status-error color */
+      margin-left: 5px;
+      font-weight: bold;
+      font-size: 0.9em;
+  }
+  
+  /* Optional pulsing animation for listening state */
+  /* @keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+  } */

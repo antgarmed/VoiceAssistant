@@ -1,0 +1,274 @@
+2025-04-20 11:04:01,973 - llm:230 - INFO - LLM Service starting up...
+2025-04-20 11:04:01,974 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-20 11:04:01,979 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-20 11:04:01,979 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-20 11:04:01,980 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-20 11:04:01,980 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-20 11:04:01,980 - llm:122 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' not found locally. Attempting download from repo 'bartowski/Llama-3.2-1B-Instruct-GGUF'.
+2025-04-20 11:04:01,980 - llm:129 - INFO - Logging into Hugging Face Hub using provided token for download.
+2025-04-20 11:04:02,288 - llm:133 - INFO - Downloading Llama-3.2-1B-Instruct-Q4_K_M.gguf from bartowski/Llama-3.2-1B-Instruct-GGUF to /cache/llm...
+2025-04-20 11:04:02,401 - huggingface_hub.file_download:1670 - WARNING - Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2025-04-20 11:04:23,178 - llm:158 - INFO - Successfully downloaded GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' to /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf in 21.20 seconds.
+2025-04-20 11:04:23,179 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-20 11:04:23,180 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-20 11:04:23,675 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.50s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-20 11:24:20,843 - llm:230 - INFO - LLM Service starting up...
+2025-04-20 11:24:20,843 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-20 11:24:20,849 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-20 11:24:20,849 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-20 11:24:20,849 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-20 11:24:20,849 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-20 11:24:20,850 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-20 11:24:20,850 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-20 11:24:20,850 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-20 11:24:21,701 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.85s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-20 12:01:15,007 - llm:230 - INFO - LLM Service starting up...
+2025-04-20 12:01:15,007 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-20 12:01:15,012 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-20 12:01:15,012 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-20 12:01:15,012 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-20 12:01:15,012 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-20 12:01:15,012 - llm:122 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' not found locally. Attempting download from repo 'bartowski/Llama-3.2-1B-Instruct-GGUF'.
+2025-04-20 12:01:15,013 - llm:129 - INFO - Logging into Hugging Face Hub using provided token for download.
+2025-04-20 12:01:15,203 - llm:133 - INFO - Downloading Llama-3.2-1B-Instruct-Q4_K_M.gguf from bartowski/Llama-3.2-1B-Instruct-GGUF to /cache/llm...
+2025-04-20 12:01:15,301 - huggingface_hub.file_download:1670 - WARNING - Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2025-04-20 12:01:35,590 - llm:158 - INFO - Successfully downloaded GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' to /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf in 20.58 seconds.
+2025-04-20 12:01:35,591 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-20 12:01:35,592 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-20 12:01:35,976 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.38s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-20 12:32:14,095 - llm:230 - INFO - LLM Service starting up...
+2025-04-20 12:32:14,095 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-20 12:32:14,099 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-20 12:32:14,099 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-20 12:32:14,100 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-20 12:32:14,100 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-20 12:32:14,100 - llm:122 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' not found locally. Attempting download from repo 'bartowski/Llama-3.2-1B-Instruct-GGUF'.
+2025-04-20 12:32:14,100 - llm:129 - INFO - Logging into Hugging Face Hub using provided token for download.
+2025-04-20 12:32:14,356 - llm:133 - INFO - Downloading Llama-3.2-1B-Instruct-Q4_K_M.gguf from bartowski/Llama-3.2-1B-Instruct-GGUF to /cache/llm...
+2025-04-20 12:32:14,452 - huggingface_hub.file_download:1670 - WARNING - Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2025-04-20 12:32:36,200 - llm:158 - INFO - Successfully downloaded GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' to /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf in 22.10 seconds.
+2025-04-20 12:32:36,201 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-20 12:32:36,201 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-20 12:32:36,572 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.37s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-21 06:16:07,367 - llm:230 - INFO - LLM Service starting up...
+2025-04-21 06:16:07,367 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 06:16:07,373 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-21 06:16:07,373 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-21 06:16:07,373 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-21 06:16:07,373 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-21 06:16:07,373 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-21 06:16:07,374 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-21 06:16:07,374 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-21 06:16:08,217 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.84s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-21 06:43:38,866 - llm:230 - INFO - LLM Service starting up...
+2025-04-21 06:43:38,866 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 06:43:38,871 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-21 06:43:38,871 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-21 06:43:38,871 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-21 06:43:38,871 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-21 06:43:38,872 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-21 06:43:38,872 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-21 06:43:38,872 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-21 06:43:39,667 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.80s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-21 07:26:34,230 - llm:230 - INFO - LLM Service starting up...
+2025-04-21 07:26:34,230 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 07:26:34,235 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-21 07:26:34,235 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-21 07:26:34,235 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-21 07:26:34,235 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-21 07:26:34,235 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-21 07:26:34,235 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-21 07:26:34,236 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-21 07:26:35,024 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.79s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-21 08:08:20,019 - llm:230 - INFO - LLM Service starting up...
+2025-04-21 08:08:20,019 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 08:08:20,024 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-21 08:08:20,024 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-21 08:08:20,025 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-21 08:08:20,025 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-21 08:08:20,025 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-21 08:08:20,025 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-21 08:08:20,026 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-21 08:08:20,894 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.87s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-21 08:25:31,240 - llm:230 - INFO - LLM Service starting up...
+2025-04-21 08:25:31,240 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-21 08:25:31,246 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-21 08:25:31,247 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-21 08:25:31,247 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-21 08:25:31,247 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-21 08:25:31,247 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-21 08:25:31,247 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-21 08:25:31,248 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-21 08:25:31,809 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.56s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-23 06:26:29,237 - llm:230 - INFO - LLM Service starting up...
+2025-04-23 06:26:29,237 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 06:26:29,243 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-23 06:26:29,243 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 06:26:29,243 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-23 06:26:29,243 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-23 06:26:29,244 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-23 06:26:29,244 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-23 06:26:29,244 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-23 06:26:30,119 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.87s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-23 07:12:56,193 - llm:230 - INFO - LLM Service starting up...
+2025-04-23 07:12:56,193 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 07:12:56,198 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-23 07:12:56,198 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 07:12:56,199 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-23 07:12:56,199 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-23 07:12:56,199 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-23 07:12:56,199 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-23 07:12:56,200 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-23 07:12:57,268 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 1.07s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-23 07:28:38,875 - llm:230 - INFO - LLM Service starting up...
+2025-04-23 07:28:38,876 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 07:28:38,881 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-23 07:28:38,881 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 07:28:38,882 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-23 07:28:38,882 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-23 07:28:38,882 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-23 07:28:38,882 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-23 07:28:38,882 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-23 07:28:39,658 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.78s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-23 07:30:51,358 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 07:30:51,360 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 07:30:52,172 - llm:339 - INFO - Generation successful in 0.812s. Total request time: 0.813s.
+2025-04-23 07:30:52,173 - llm:340 - INFO - Usage - Prompt: 50, Completion: 35, Total: 85
+2025-04-23 07:36:28,141 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 07:36:28,141 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 07:36:28,517 - llm:339 - INFO - Generation successful in 0.376s. Total request time: 0.376s.
+2025-04-23 07:36:28,518 - llm:340 - INFO - Usage - Prompt: 44, Completion: 18, Total: 62
+2025-04-23 08:02:51,321 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 08:02:51,323 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 08:02:52,949 - llm:339 - INFO - Generation successful in 1.625s. Total request time: 1.626s.
+2025-04-23 08:02:52,949 - llm:340 - INFO - Usage - Prompt: 46, Completion: 32, Total: 78
+2025-04-23 08:10:08,345 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 08:10:08,347 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 08:10:09,945 - llm:339 - INFO - Generation successful in 1.598s. Total request time: 1.599s.
+2025-04-23 08:10:09,945 - llm:340 - INFO - Usage - Prompt: 40, Completion: 32, Total: 72
+2025-04-23 08:27:13,312 - llm:230 - INFO - LLM Service starting up...
+2025-04-23 08:27:13,312 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 08:27:13,316 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-23 08:27:13,316 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 08:27:13,317 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-23 08:27:13,317 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-23 08:27:13,317 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-23 08:27:13,317 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-23 08:27:13,317 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-23 08:27:14,226 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.91s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-23 08:49:18,479 - llm:230 - INFO - LLM Service starting up...
+2025-04-23 08:49:18,480 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 08:49:18,484 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-23 08:49:18,484 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 08:49:18,484 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-23 08:49:18,484 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-23 08:49:18,485 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-23 08:49:18,485 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-23 08:49:18,485 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-23 08:49:19,226 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.74s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-23 08:51:03,306 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 08:51:03,307 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 08:51:03,952 - llm:339 - INFO - Generation successful in 0.644s. Total request time: 0.645s.
+2025-04-23 08:51:03,952 - llm:340 - INFO - Usage - Prompt: 42, Completion: 9, Total: 51
+2025-04-23 09:19:51,972 - llm:230 - INFO - LLM Service starting up...
+2025-04-23 09:19:51,973 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 09:19:51,977 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-23 09:19:51,977 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 09:19:51,977 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-23 09:19:51,977 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-23 09:19:51,977 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-23 09:19:51,978 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-23 09:19:51,978 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-23 09:19:52,336 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.36s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-23 09:23:23,036 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 09:23:23,037 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 09:23:23,906 - llm:339 - INFO - Generation successful in 0.869s. Total request time: 0.869s.
+2025-04-23 09:23:23,907 - llm:340 - INFO - Usage - Prompt: 42, Completion: 26, Total: 68
+2025-04-23 09:37:55,768 - llm:230 - INFO - LLM Service starting up...
+2025-04-23 09:37:55,768 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-23 09:37:55,772 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-23 09:37:55,773 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-23 09:37:55,773 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-23 09:37:55,773 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-23 09:37:55,773 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-23 09:37:55,773 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-23 09:37:55,773 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-23 09:37:56,627 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.85s. GPU Layer Status: requested=-1, actual=unknown
+2025-04-23 10:48:22,985 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 10:48:22,991 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 10:48:24,942 - llm:339 - INFO - Generation successful in 1.950s. Total request time: 1.953s.
+2025-04-23 10:48:24,942 - llm:340 - INFO - Usage - Prompt: 40, Completion: 29, Total: 69
+2025-04-23 11:09:22,792 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 11:09:22,792 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 11:09:23,548 - llm:339 - INFO - Generation successful in 0.755s. Total request time: 0.755s.
+2025-04-23 11:09:23,548 - llm:340 - INFO - Usage - Prompt: 42, Completion: 13, Total: 55
+2025-04-23 11:10:21,884 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 11:10:21,885 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 11:10:22,120 - llm:339 - INFO - Generation successful in 0.234s. Total request time: 0.236s.
+2025-04-23 11:10:22,121 - llm:340 - INFO - Usage - Prompt: 44, Completion: 9, Total: 53
+2025-04-23 12:30:52,117 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 12:30:52,118 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 12:30:53,304 - llm:339 - INFO - Generation successful in 1.185s. Total request time: 1.186s.
+2025-04-23 12:30:53,305 - llm:340 - INFO - Usage - Prompt: 44, Completion: 26, Total: 70
+2025-04-23 12:35:38,268 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 12:35:38,269 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 12:35:38,503 - llm:339 - INFO - Generation successful in 0.234s. Total request time: 0.234s.
+2025-04-23 12:35:38,503 - llm:340 - INFO - Usage - Prompt: 42, Completion: 9, Total: 51
+2025-04-23 13:40:03,447 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 13:40:03,451 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 13:40:04,509 - llm:339 - INFO - Generation successful in 1.058s. Total request time: 1.060s.
+2025-04-23 13:40:04,510 - llm:340 - INFO - Usage - Prompt: 42, Completion: 17, Total: 59
+2025-04-23 13:53:42,658 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 13:53:42,660 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 13:53:43,538 - llm:339 - INFO - Generation successful in 0.878s. Total request time: 0.879s.
+2025-04-23 13:53:43,539 - llm:340 - INFO - Usage - Prompt: 44, Completion: 17, Total: 61
+2025-04-23 14:20:30,362 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 14:20:30,363 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 14:20:32,030 - llm:339 - INFO - Generation successful in 1.667s. Total request time: 1.668s.
+2025-04-23 14:20:32,031 - llm:340 - INFO - Usage - Prompt: 42, Completion: 32, Total: 74
+2025-04-23 14:38:40,347 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 14:38:40,349 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 14:38:41,535 - llm:339 - INFO - Generation successful in 1.185s. Total request time: 1.187s.
+2025-04-23 14:38:41,536 - llm:340 - INFO - Usage - Prompt: 42, Completion: 41, Total: 83
+2025-04-23 15:03:21,153 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 15:03:21,155 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 15:03:21,929 - llm:339 - INFO - Generation successful in 0.774s. Total request time: 0.775s.
+2025-04-23 15:03:21,930 - llm:340 - INFO - Usage - Prompt: 51, Completion: 7, Total: 58
+2025-04-23 15:20:33,233 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 15:20:33,234 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 15:20:34,260 - llm:339 - INFO - Generation successful in 1.026s. Total request time: 1.027s.
+2025-04-23 15:20:34,260 - llm:340 - INFO - Usage - Prompt: 53, Completion: 18, Total: 71
+2025-04-23 15:36:57,433 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 15:36:57,435 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 15:36:58,564 - llm:339 - INFO - Generation successful in 1.129s. Total request time: 1.130s.
+2025-04-23 15:36:58,564 - llm:340 - INFO - Usage - Prompt: 42, Completion: 12, Total: 54
+2025-04-23 15:43:15,713 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 15:43:15,713 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 15:43:16,212 - llm:339 - INFO - Generation successful in 0.499s. Total request time: 0.499s.
+2025-04-23 15:43:16,213 - llm:340 - INFO - Usage - Prompt: 46, Completion: 23, Total: 69
+2025-04-23 15:44:49,463 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 15:44:49,463 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 15:44:52,969 - llm:339 - INFO - Generation successful in 3.506s. Total request time: 3.506s.
+2025-04-23 15:44:52,969 - llm:340 - INFO - Usage - Prompt: 48, Completion: 16, Total: 64
+2025-04-23 16:00:28,096 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 16:00:28,096 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 16:00:28,938 - llm:339 - INFO - Generation successful in 0.841s. Total request time: 0.842s.
+2025-04-23 16:00:28,938 - llm:340 - INFO - Usage - Prompt: 44, Completion: 24, Total: 68
+2025-04-23 16:08:03,577 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 16:08:03,577 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 16:08:05,371 - llm:339 - INFO - Generation successful in 1.794s. Total request time: 1.794s.
+2025-04-23 16:08:05,372 - llm:340 - INFO - Usage - Prompt: 46, Completion: 40, Total: 86
+2025-04-23 16:46:28,200 - llm:299 - INFO - Received generation request with 2 messages.
+2025-04-23 16:46:28,203 - llm:314 - INFO - Generating chat completion (temp=0.7, max_tokens=512, top_p=0.9)...
+2025-04-23 16:46:29,642 - llm:339 - INFO - Generation successful in 1.439s. Total request time: 1.440s.
+2025-04-23 16:46:29,643 - llm:340 - INFO - Usage - Prompt: 44, Completion: 31, Total: 75
+2025-04-24 00:31:34,870 - llm:230 - INFO - LLM Service starting up...
+2025-04-24 00:31:34,871 - llm:60 - INFO - Loading configuration from: /app/config.yaml
+2025-04-24 00:31:34,875 - llm:75 - INFO - Configured n_gpu_layers: -1
+2025-04-24 00:31:34,876 - llm:76 - INFO - USE_GPU environment variable: 'auto'
+2025-04-24 00:31:34,876 - llm:84 - INFO - GPU usage enabled/auto. Using configured n_gpu_layers: -1. Availability checked at load time.
+2025-04-24 00:31:34,876 - llm:92 - INFO - LLM effective n_gpu_layers set to: -1
+2025-04-24 00:31:34,876 - llm:118 - INFO - GGUF model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' found locally at /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf.
+2025-04-24 00:31:34,877 - llm:187 - INFO - Attempting to load LLM model from: /cache/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf
+2025-04-24 00:31:34,877 - llm:188 - INFO - Parameters: n_gpu_layers=-1, n_ctx=4096, chat_format=llama-3
+2025-04-24 00:31:35,695 - llm:216 - INFO - LLM Model 'Llama-3.2-1B-Instruct-Q4_K_M.gguf' loaded successfully in 0.82s. GPU Layer Status: requested=-1, actual=unknown

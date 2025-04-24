@@ -1,0 +1,64 @@
+# voice-assistant/shared/config.yaml
+
+# --- Model Configuration ---
+asr:
+  # faster-whisper settings
+  # Model will be downloaded to CACHE_DIR if not present
+  model_name: "large-v3"        # HF Hub identifier (e.g., "large-v3", "distil-large-v3", "base.en")
+  compute_type: "int8_float16"  # Performance/VRAM trade-off ("float16", "int8")
+  device: "auto"                # "cuda", "cpu", "auto"
+  # Transcription parameters
+  beam_size: 5
+  language: "en"                # Set null for auto-detect, 'en' for English-only
+  vad_filter: true              # Enable Voice Activity Detection
+  vad_parameters:               # Tune VAD sensitivity
+    threshold: 0.5
+    min_speech_duration_ms: 250
+    min_silence_duration_ms: 700
+
+llm:
+  # Llama GGUF settings
+  # Model will be downloaded from HF Hub repo to CACHE_DIR/llm if not present
+  model_repo_id: "bartowski/Llama-3.2-1B-Instruct-GGUF" # HF Repo to download from
+  model_filename: "Llama-3.2-1B-Instruct-Q4_K_M.gguf" # Specific file to download
+  # llama-cpp-python runtime parameters
+  n_gpu_layers: -1              # Max GPU offload (-1), or 0 for CPU
+  n_ctx: 4096                   # Context window size
+  temperature: 0.7              # Sampling temperature
+  max_tokens: 512               # Max generation length
+  top_p: 0.9                    # Nucleus sampling probability
+  chat_format: "llama-3"        # Ensure correct prompt format for Llama 3
+
+tts:
+  # Sesame CSM Fine-tune (senstella/csm-expressiva-1b) settings
+  # Models (CSM + base Llama) will be downloaded from HF Hub to CACHE_DIR if not present
+  model_repo_id: "senstella/csm-expressiva-1b" # Fine-tuned CSM repo
+  # Base Llama model (often needed by CSM library, usually downloaded automatically as dependency)
+  llama_dependency_repo_id: "meta-llama/Llama-3.2-1B"
+  # Runtime parameters
+  device: "auto"                # MUST resolve to 'cuda' for CSM. 'auto' will try CUDA.
+  speaker_id: 4                 # Specific speaker ID for this fine-tune (matches .env)
+  temperature: 0.8              # Synthesis temperature
+  top_k: 50                     # Synthesis top-k sampling
+  max_audio_length_ms: 20000    # Max generation length (20s)
+  expected_sample_rate: 24000   # Sample rate of the CSM model
+
+# --- Internal API Endpoints (Reference Only - URLs constructed from env vars in orchestrator) ---
+# api_endpoints:
+#   asr: "http://asr:${ASR_PORT}/transcribe"
+#   llm: "http://llm:${LLM_PORT}/generate"
+#   tts: "http://tts:${TTS_PORT}/synthesize"
+
+# --- Logging Configuration ---
+logging:
+  format: "%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s"
+  log_file_base: "/app/logs/service" # Base path, service name appended (e.g., _asr.log)
+  # Level controlled by LOG_LEVEL env var
+
+# --- Orchestrator Settings ---
+orchestrator:
+  max_history_turns: 5
+  system_prompt: |
+    You are Astra, a friendly and helpful voice assistant.
+    Respond naturally and concisely, as if speaking.
+  vad_silence_ms: 1500 # Silence threshold for VAD (frontend/orchestrator use)
