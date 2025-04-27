@@ -60,9 +60,13 @@ export const MicrophoneButton: React.FC = () => {
       (audioChunk) => handleIncomingAudioChunk(audioChunk),
       () => {
         console.log(`Streaming ended for utterance: ${utteranceId}`);
-        setTtsWebSocket(null);
-        setAppState(AppState.IDLE);
-      },
+        setTimeout(() => {
+          setTtsWebSocket(null);
+          setAppState(AppState.IDLE);
+          console.log('Playback finished. Now idle.');
+        }, 500); // 500ms buffer to let the final audio finish playing
+      }
+      ,
       (error) => {
         console.error(`TTS stream error:`, error);
         setError(`TTS streaming error.`);
@@ -130,7 +134,6 @@ export const MicrophoneButton: React.FC = () => {
   const isThinking = appState === AppState.THINKING;
   const isSpeaking = appState === AppState.SPEAKING;
   const isDisabled = isThinking; // disable recording when thinking
-  const showStopButton = isRecording || isSpeaking;
 
   return (
     <div className="controls">
