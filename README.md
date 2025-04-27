@@ -247,3 +247,6 @@ Tells PyTorch to optimize even when input sizes vary (which they do in TTS – d
 Without it, torch.compile can be a little conservative (less aggressive optimizations).
 
 With it, performance can improve another 5–15%, sometimes even more.
+
+
+Look into raising the temp of the TTS, could speed up generation
