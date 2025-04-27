@@ -103,7 +103,6 @@ services:
       - CONFIG_PATH=/app/config.yaml
       - LOG_FILE_BASE=/app/logs/service
       - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN} # REQUIRED
-      - NO_TORCH_COMPILE=1 # Keep if using pre-compiled models or avoiding compile issues
       - TTS_SPEAKER_ID=${TTS_SPEAKER_ID:-4} # Default to 4 for expressiva model
       - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
