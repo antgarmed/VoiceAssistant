@@ -1,5 +1,5 @@
 # backend/orchestrator/orchestrator.py
-# --- Added temporary max_audio_length_ms limit for testing ---
+
 import os
 import logging
 import time
@@ -65,9 +65,8 @@ def load_configuration():
     try:
         logger.info(f"Loading configuration from: {CONFIG_PATH}")
         if not os.path.exists(CONFIG_PATH):
-            # If config doesn't exist, log warning and use defaults
             logger.warning(f"Config file not found at {CONFIG_PATH}. Using defaults.")
-            config = {} # Set empty config to proceed with defaults
+            config = {}
         else:
             with open(CONFIG_PATH, 'r') as f:
                 config = yaml.safe_load(f)
@@ -161,20 +160,18 @@ async def call_llm_service(history: List[Dict[str, str]]) -> str:
         raise HTTPException(status_code=status_code, detail=detail)
     except Exception as e: logger.error(f"Unexpected error calling LLM: {e}", exc_info=True); raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal error communicating with LLM: {e}")
 
-# --- Corrected call_tts_service_ws ---
+# --- Function with MODIFICATIONS ---
 async def call_tts_service_ws(text: str, max_audio_length_ms: Optional[float] = None) -> bytes:
     """Calls the TTS service WebSocket endpoint to synthesize audio stream."""
     ws_url = api_endpoints['tts_ws']
     utterance_id = str(uuid.uuid4())
     logger.info(f"Connecting to TTS WebSocket at {ws_url} for utterance_id: {utterance_id}")
-    # Construct the message payload including the optional max_audio_length_ms
+
     message_payload = {
         "type": "generate_chunk",
         "text_chunk": text,
         "utterance_id": utterance_id
     }
-    # Only add max_audio_length_ms if provided (for temporary testing)
-    # The TTS service itself should have its own default if not provided here
     if max_audio_length_ms is not None:
         message_payload["max_audio_length_ms"] = max_audio_length_ms
         logger.info(f"Requesting max audio length: {max_audio_length_ms}ms for {utterance_id}")
@@ -182,10 +179,20 @@ async def call_tts_service_ws(text: str, max_audio_length_ms: Optional[float] = 
          logger.info(f"Sending text to TTS service via WS (no explicit max length): '{text[:50]}...' for {utterance_id}")
 
     all_audio_bytes = bytearray()
-    receive_timeout_seconds = 45.0 # Default timeout - ADJUST IF NEEDED LATER
+    receive_timeout_seconds = 90.0 # Increased timeout
+
+    websocket_connection = None # Keep track of the connection object
 
     try:
-        async with websockets.connect(ws_url, open_timeout=20, close_timeout=10, ping_interval=20, ping_timeout=20) as websocket:
+        # Use 'async with' to ensure connection is closed even on errors inside
+        async with websockets.connect(
+            ws_url,
+            open_timeout=90,
+            close_timeout=20,
+            ping_interval=30,
+            ping_timeout=60
+        ) as websocket:
+            websocket_connection = websocket # Assign to outer scope variable
             logger.info(f"TTS WebSocket connection established for {utterance_id}.")
             await websocket.send(json.dumps(message_payload))
             logger.info(f"Sent 'generate_chunk' request for {utterance_id}.")
@@ -193,9 +200,8 @@ async def call_tts_service_ws(text: str, max_audio_length_ms: Optional[float] = 
             last_message_time = time.monotonic()
             while True:
                 try:
-                    # Wait for the next message with timeout relative to the last received message
                     wait_time = max(0, receive_timeout_seconds - (time.monotonic() - last_message_time))
-                    if wait_time == 0: # Check before waiting if timeout already exceeded
+                    if wait_time <= 0:
                         if all_audio_bytes:
                              logger.warning(f"TTS WebSocket receive timed out after {receive_timeout_seconds}s of inactivity for {utterance_id}. Received {len(all_audio_bytes)} bytes. Assuming stream ended.")
                              break
@@ -204,7 +210,7 @@ async def call_tts_service_ws(text: str, max_audio_length_ms: Optional[float] = 
                              raise HTTPException(status_code=status.HTTP_504_GATEWAY_TIMEOUT, detail="TTS service timed out waiting for audio.")
 
                     message_json = await asyncio.wait_for(websocket.recv(), timeout=wait_time)
-                    last_message_time = time.monotonic() # Reset timer on successful receive
+                    last_message_time = time.monotonic()
                     message = json.loads(message_json)
                     msg_type = message.get("type")
 
@@ -230,7 +236,6 @@ async def call_tts_service_ws(text: str, max_audio_length_ms: Optional[float] = 
                         logger.warning(f"Received unknown message type '{msg_type}' from TTS WS for {utterance_id}.")
 
                 except asyncio.TimeoutError:
-                    # This block is now reached only if wait_for times out
                     if all_audio_bytes:
                          logger.warning(f"TTS WebSocket receive timed out after {receive_timeout_seconds}s of inactivity for {utterance_id}. Received {len(all_audio_bytes)} bytes. Assuming stream ended.")
                          break
@@ -244,17 +249,7 @@ async def call_tts_service_ws(text: str, max_audio_length_ms: Optional[float] = 
                      logger.error(f"TTS WebSocket connection closed with error for {utterance_id}: {e}. Received {len(all_audio_bytes)} bytes.")
                      if all_audio_bytes: break
                      raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"TTS WebSocket connection error: {e}")
-
-            if websocket.open:
-                try:
-                     await websocket.send(json.dumps({"type": "clear_context", "utterance_id": utterance_id}))
-                     logger.info(f"Sent 'clear_context' request for {utterance_id}.")
-                except websockets.exceptions.ConnectionClosed:
-                     logger.warning(f"Could not send 'clear_context' for {utterance_id}, connection already closed.")
-                except Exception as clear_err:
-                     logger.warning(f"Error sending 'clear_context' for {utterance_id}: {clear_err}")
-            else:
-                logger.warning(f"WebSocket connection for {utterance_id} already closed before sending 'clear_context'.")
+            # 'async with' closes websocket here
 
         logger.info(f"TTS WebSocket processing for {utterance_id} complete. Total audio bytes: {len(all_audio_bytes)}.")
         if not all_audio_bytes:
@@ -267,12 +262,37 @@ async def call_tts_service_ws(text: str, max_audio_length_ms: Optional[float] = 
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Invalid TTS WebSocket URI configured: {ws_url}")
     except websockets.exceptions.WebSocketException as e:
         logger.error(f"TTS WebSocket connection failed to {ws_url}: {e}")
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Failed to connect to TTS service WebSocket: {e}")
-    except HTTPException:
-        raise
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Failed to connect/communicate with TTS service WebSocket: {e}")
+    except HTTPException as http_exc:
+        logger.error(f"Propagating HTTPException from TTS interaction: {http_exc.detail}")
+        raise http_exc
     except Exception as e:
-        logger.error(f"Unexpected error calling TTS via WebSocket: {e}", exc_info=True)
+        logger.error(f"Unexpected error calling TTS via WebSocket ({type(e).__name__}): {e}", exc_info=True)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal error communicating with TTS: {e}")
+    finally:
+        # --- MODIFIED finally block ---
+        # Check if the connection object was successfully assigned
+        # and attempt to send clear_context if it might be open.
+        if websocket_connection: # Check if the connection object exists
+            try:
+                # We don't need to explicitly check 'closed' here,
+                # just attempt the send and catch the specific error if it's closed.
+                logger.info(f"Attempting to send 'clear_context' for {utterance_id} in finally block.")
+                await asyncio.wait_for(
+                    websocket_connection.send(json.dumps({"type": "clear_context", "utterance_id": utterance_id})),
+                    timeout=5.0 # Keep timeout
+                )
+                logger.info(f"Sent 'clear_context' request for {utterance_id} in finally block.")
+            except websockets.exceptions.ConnectionClosed:
+                logger.warning(f"Could not send 'clear_context' for {utterance_id} in finally block, connection was already closed.")
+            except asyncio.TimeoutError:
+                 logger.warning(f"Timed out sending 'clear_context' for {utterance_id} in finally block.")
+            except Exception as clear_err:
+                # Catch other potential errors during send
+                logger.warning(f"Error sending 'clear_context' for {utterance_id} in finally block ({type(clear_err).__name__}): {clear_err}")
+        else:
+             logger.debug(f"Skipping 'clear_context' send in finally block for {utterance_id}, connection object is None.")
+        # --- END OF MODIFIED finally block ---
 
 # --- Conversation History Management ---
 def update_history(user_text: str, assistant_text: str):
@@ -298,7 +318,7 @@ async def lifespan(app: FastAPI):
     limits = httpx.Limits(max_keepalive_connections=20, max_connections=100)
     http_client = httpx.AsyncClient(timeout=timeout, limits=limits, follow_redirects=True)
     logger.info("HTTP client initialized.")
-    await asyncio.sleep(5)
+    await asyncio.sleep(5) # Give services time to start before health check
     await check_backend_services()
     yield
     logger.info(f"{SERVICE_NAME.upper()} Service shutting down...")
@@ -330,7 +350,7 @@ async def check_backend_services():
 
 # --- FastAPI App Creation and CORS ---
 app = FastAPI(lifespan=lifespan, title="Voice Assistant Orchestrator", version="1.1.0")
-origins = ["*"]
+origins = ["*"] # Allow all origins for simplicity in local dev
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -361,13 +381,12 @@ async def handle_assist_request(audio: UploadFile = File(..., description="User 
         user_transcript = await call_asr_service(audio)
         asr_time = (time.monotonic() - asr_start_time) * 1000
 
-        # --- Handle no speech ---
+        # Handle no speech
         if not user_transcript:
             logger.info("ASR returned no transcript. Generating no-speech response.")
             no_speech_response = "Sorry, I didn't hear anything."
             tts_no_speech_start_time = time.monotonic()
-            # Limit max length for no-speech response for speed
-            no_speech_audio_bytes = await call_tts_service_ws(no_speech_response, max_audio_length_ms=5000)
+            no_speech_audio_bytes = await call_tts_service_ws(no_speech_response)
             tts_no_speech_time = (time.monotonic() - tts_no_speech_start_time) * 1000
             logger.info(f"No-speech TTS took {tts_no_speech_time:.0f}ms")
             no_speech_audio_b64 = base64.b64encode(no_speech_audio_bytes).decode('utf-8') if no_speech_audio_bytes else ""
@@ -387,14 +406,14 @@ async def handle_assist_request(audio: UploadFile = File(..., description="User 
         assistant_response = await call_llm_service(current_llm_input)
         llm_time = (time.monotonic() - llm_start_time) * 1000
 
-        # 4. Call TTS Service via WebSocket (WITH TEMPORARY LIMIT)
+        # 4. Call TTS Service via WebSocket
         tts_start_time = time.monotonic()
-        # --- Apply TEMPORARY max_audio_length_ms limit for testing ---
-        assistant_audio_bytes = await call_tts_service_ws(
-            assistant_response,
-            max_audio_length_ms=5000 # Limit to 5 seconds (~375 frames)
-        )
-        # ----------------------------------------------------------
+        # TEMPORARY LIMIT REMOVED FOR FULL TESTING (can be added back if needed)
+        assistant_audio_bytes = await call_tts_service_ws(assistant_response)
+        # assistant_audio_bytes = await call_tts_service_ws(
+        #     assistant_response,
+        #     max_audio_length_ms=5000 # Limit to 5 seconds (~375 frames) if testing
+        # )
         tts_time = (time.monotonic() - tts_start_time) * 1000
 
         # 5. Update History
@@ -416,7 +435,7 @@ async def handle_assist_request(audio: UploadFile = File(..., description="User 
 
     except HTTPException as http_exc:
          logger.error(f"Pipeline failed due to HTTPException: {http_exc.status_code} - {http_exc.detail}")
-         raise http_exc
+         raise http_exc # Re-raise the exception to return proper HTTP error
     except Exception as e:
         logger.error(f"Unexpected error during /assist pipeline: {e}", exc_info=True)
         raise HTTPException(
@@ -455,5 +474,22 @@ if __name__ == "__main__":
     port = int(os.getenv('ORCHESTRATOR_PORT', 5000))
     log_level_param = LOG_LEVEL.lower()
     logger.info(f"Launching Uvicorn on host 0.0.0.0, port {port} with log level {log_level_param}...")
-    uvicorn.run("orchestrator:app", host="0.0.0.0", port=port, log_level=log_level_param, reload=False)
-    logger.info(f"{SERVICE_NAME.upper()} Service shutting down (direct run)...")
+    try:
+        # Run check_backend_services manually when running directly
+        async def run_checks():
+             await asyncio.sleep(5)
+             await check_backend_services()
+        # asyncio.run(run_checks()) # Cannot run async within sync __main__ easily
+
+        uvicorn.run("orchestrator:app", host="0.0.0.0", port=port, log_level=log_level_param, reload=False)
+    except Exception as main_err:
+         logger.critical(f"Failed to start Uvicorn directly: {main_err}", exc_info=True)
+         exit(1)
+    finally:
+        # Clean up HTTP client if running directly caused an early exit
+        if http_client and not http_client.is_closed:
+            asyncio.run(http_client.aclose())
+            logger.info(f"{SERVICE_NAME.upper()} HTTP client closed (direct run shutdown).")
+        logger.info(f"{SERVICE_NAME.upper()} Service shutting down (direct run)...")
+
+# --- END OF FILE ---
