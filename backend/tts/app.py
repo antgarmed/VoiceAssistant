@@ -44,17 +44,14 @@ except ImportError as e:
 load_dotenv()
 CONFIG_PATH = os.getenv('CONFIG_PATH', '/app/config.yaml')
 CACHE_DIR = Path(os.getenv('CACHE_DIR', '/cache'))
-# Use HF_HOME if set, otherwise default to CACHE_DIR/huggingface
 HF_HOME_ENV = os.getenv('HF_HOME')
 HF_CACHE_DIR = Path(HF_HOME_ENV) if HF_HOME_ENV else CACHE_DIR / "huggingface"
-# Ensure HF_HOME env var is actually set for processes using it (like huggingface_hub)
 os.environ['HF_HOME'] = str(HF_CACHE_DIR)
-
 LOG_FILE_BASE = os.getenv('LOG_FILE_BASE', '/app/logs/service')
 LOG_LEVEL = os.getenv('LOG_LEVEL', 'info').upper()
 USE_GPU_ENV = os.getenv('USE_GPU', 'auto').lower()
 HF_TOKEN = os.getenv('HUGGING_FACE_TOKEN')
-TTS_SPEAKER_ID = int(os.getenv('TTS_SPEAKER_ID', '4')) # Default to 4 for expressiva
+TTS_SPEAKER_ID = int(os.getenv('TTS_SPEAKER_ID', '4'))
 TTS_MODEL_REPO_ID_DEFAULT = 'senstella/csm-expressiva-1b'
 TTS_MODEL_REPO_ID_ENV = os.getenv('TTS_MODEL_REPO_ID', TTS_MODEL_REPO_ID_DEFAULT)
 SERVICE_NAME = "tts_streaming"
@@ -62,25 +59,23 @@ LOG_PATH = f"{LOG_FILE_BASE}_{SERVICE_NAME}.log"
 
 # --- Logging Setup ---
 os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
-HF_CACHE_DIR.mkdir(parents=True, exist_ok=True) # Create HF cache dir
+HF_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 logging.basicConfig(
     level=LOG_LEVEL,
     format="%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s",
     handlers=[logging.StreamHandler(), logging.FileHandler(LOG_PATH)]
 )
 logger = logging.getLogger(SERVICE_NAME)
-# Reduce verbosity of specific libraries if needed
-# logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
 
 # --- Global Variables ---
 tts_generator: Optional[Generator] = None
 tts_config: Dict[str, Any] = {}
 effective_device: str = "cpu"
 model_load_info: Dict[str, Any] = {"status": "pending"}
-# Cache for utterance context (mapping utterance_id to list of Segments)
 utterance_context_cache: Dict[str, List[Segment]] = {}
 
 # --- Configuration Loading ---
+# ... (Keep existing load_configuration function as is) ...
 def load_configuration():
     global tts_config, effective_device, TTS_SPEAKER_ID, model_load_info
     try:
@@ -142,7 +137,6 @@ def load_configuration():
                   logger.warning("CUDA not available or disabled. TTS service cannot load CSM model.")
                   model_load_info.update({"status": "error", "error": "CUDA unavailable/disabled, required by CSM."})
 
-
         tts_config['effective_device'] = effective_device
         logger.info(f"TTS effective device target: {effective_device}")
 
@@ -152,14 +146,13 @@ def load_configuration():
         tts_config['top_k'] = int(tts_config.get('top_k', 50))
         logger.info(f"Generation params: max_len={tts_config['max_audio_length_ms']}ms, temp={tts_config['temperature']}, top_k={tts_config['top_k']}")
 
-
     except Exception as e:
         logger.critical(f"Unexpected error loading configuration: {e}", exc_info=True)
         tts_config = {} # Reset config on error
         model_load_info.update({"status": "error", "error": f"Config error: {e}"})
 
-
 # --- Model Loading ---
+# ... (Keep existing load_tts_model function as is) ...
 def load_tts_model():
     global tts_generator, model_load_info, tts_config
     if not CSM_LOADED:
@@ -167,17 +160,14 @@ def load_tts_model():
          logger.critical(f"Cannot load model: {error_msg}")
          raise RuntimeError(error_msg)
 
-    # Re-check config in case loading failed earlier
     if not tts_config or model_load_info.get("status") == "error":
         error_msg = model_load_info.get("error", "TTS configuration missing or invalid.")
         logger.critical(f"Cannot load model: {error_msg}")
-        # Ensure status reflects error if not already set
         model_load_info.setdefault("status", "error")
         model_load_info.setdefault("error", error_msg)
         raise RuntimeError(error_msg)
 
     device_to_load = tts_config.get('effective_device')
-    # Check if effective device requires CUDA (which CSM does)
     if not device_to_load or not device_to_load.startswith("cuda"):
          error_msg = model_load_info.get("error", f"CSM requires CUDA, but effective device is '{device_to_load}'.")
          logger.critical(f"FATAL: {error_msg}")
@@ -197,24 +187,9 @@ def load_tts_model():
     start_time = time.monotonic()
 
     try:
-        # Login to HF Hub if token is provided
-        # Note: generator.py's load_csm_1b also handles login if needed,
-        # but doing it here makes logs clearer. Ensure token is passed consistently.
-        # if HF_TOKEN:
-        #      logger.info("Logging into Hugging Face Hub.")
-        #      login(token=HF_TOKEN, add_to_git_credential=False) # Prevents modifying git config
-        #      logger.info("HF Login successful (app level).")
-        # else:
-        #      logger.warning("HUGGING_FACE_TOKEN env var not set. Model download might fail if repo is private.")
-
         logger.info(f"Calling generator.load_csm_1b(model_id='{model_repo_id}', device='{device_to_load}')")
-        # Pass necessary env vars implicitly or explicitly if load_csm_1b needs them
-        # os.environ['HF_HOME'] = str(HF_CACHE_DIR) # Ensure HF_HOME is set for the call
-        # os.environ['HUGGING_FACE_TOKEN'] = HF_TOKEN if HF_TOKEN else '' # Pass token if available
-
         tts_generator = load_csm_1b( model_id=model_repo_id, device=device_to_load )
 
-        # Validation after load
         if tts_generator is None:
             raise RuntimeError(f"generator.load_csm_1b returned None for model '{model_repo_id}'.")
         if not isinstance(tts_generator, Generator):
@@ -223,7 +198,6 @@ def load_tts_model():
         load_time = time.monotonic() - start_time
         logger.info(f"Model load call completed in {load_time:.2f}s.")
 
-        # Get sample rate from the loaded generator
         actual_sample_rate = getattr(tts_generator, 'sample_rate', None)
         if actual_sample_rate:
              logger.info(f"Detected generator sample rate: {actual_sample_rate} Hz")
@@ -235,7 +209,6 @@ def load_tts_model():
         model_load_info.update({"status": "loaded", "load_time_s": round(load_time, 2), "sample_rate": tts_config['actual_sample_rate']})
         logger.info(f"TTS Model '{model_repo_id}' loaded successfully on {device_to_load}.")
 
-        # Verify model is on the correct device
         try:
              actual_device = next(tts_generator._model.parameters()).device
              logger.info(f"Model confirmed on device: {actual_device}")
@@ -246,24 +219,13 @@ def load_tts_model():
 
     except Exception as e:
         logger.critical(f"FATAL: Model loading failed for '{model_repo_id}': {e}", exc_info=True)
-        tts_generator = None # Ensure generator is None on failure
+        tts_generator = None
         load_time = time.monotonic() - start_time
-        # Update status even if it was already 'loading'
         model_load_info.update({"status": "error", "error": f"Model loading failed: {e}", "load_time_s": round(load_time, 2)})
-        # Re-raise the exception to stop the lifespan startup
         raise RuntimeError(f"TTS model loading failed: {e}") from e
 
-    # finally:
-        # Logout if we logged in earlier (potentially redundant if generator.py does it too)
-        # if HF_TOKEN:
-        #      try:
-        #          logout()
-        #          logger.info("HF logout successful (app level).")
-        #      except Exception as logout_err:
-        #          logger.warning(f"HF logout error (app level): {logout_err}")
-
-
 # --- FastAPI Lifespan ---
+# ... (Keep existing lifespan function as is) ...
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manages application startup and shutdown, including model loading and optional warm-up."""
@@ -282,89 +244,67 @@ async def lifespan(app: FastAPI):
         load_configuration()
         if model_load_info.get("status") == "error":
              startup_error = model_load_info.get("error", "Config loading failed.")
-             # No need to update status again, just raise
              raise RuntimeError(startup_error)
 
-        # Proceed only if config is valid and CUDA is targeted
         if tts_config.get('effective_device','cpu').startswith('cuda'):
-             load_tts_model() # This will raise RuntimeError on failure
-             # Status check after load_tts_model (should be 'loaded' if no exception)
+             load_tts_model()
              if model_load_info.get("status") != "loaded":
                    startup_error = model_load_info.get("error", "Model loading status not 'loaded' after successful call.")
                    logger.error(f"Inconsistent state: load_tts_model completed but status is {model_load_info.get('status')}")
-                   model_load_info["status"] = "error" # Force error status
+                   model_load_info["status"] = "error"
                    model_load_info.setdefault("error", startup_error)
                    raise RuntimeError(startup_error)
         else:
-             # This case should have been caught by load_configuration setting status to error
              startup_error = model_load_info.get("error", "CUDA device not configured or available.")
              logger.critical(f"Lifespan: {startup_error}")
              raise RuntimeError(startup_error)
 
-        # === Optional Model Warm-up using asyncio.to_thread ===
-        # Check generator exists and status is loaded before warmup
         if tts_generator and model_load_info.get("status") == "loaded":
             logger.info("Attempting TTS model warm-up with dummy inference...")
             warmup_speaker_id = tts_config.get('effective_speaker_id', 4)
             try:
-                # Use the non-streaming generate method for a simple warmup
-                # Run it in a thread to avoid blocking the main loop
                 await asyncio.to_thread(
-                     tts_generator.generate, # Assuming generate exists and is suitable
+                     tts_generator.generate,
                      text="Ready.",
                      speaker=warmup_speaker_id,
                      context=[],
-                     max_audio_length_ms=1000 # Short duration for warmup
-                     # stream=False # Default for generate
-                     # temperature/topk defaults are fine for warmup
+                     max_audio_length_ms=1000
                 )
                 logger.info("TTS model warm-up inference completed successfully.")
             except AttributeError:
                 logger.warning("tts_generator does not have a 'generate' method, skipping lifespan warmup.")
             except Exception as warmup_err:
-                # Log warmup failure but don't make it fatal for startup
                 logger.warning(f"TTS model warm-up failed: {warmup_err}", exc_info=True)
-        # =======================================================
 
         logger.info("Lifespan startup sequence completed successfully.")
 
     except Exception as e:
-        # Catch any exception during the startup sequence
         startup_error = str(e)
         logger.critical(f"Lifespan startup failed: {startup_error}", exc_info=True)
-        # Ensure status is error and error message is set
         model_load_info["status"] = "error"
         model_load_info.setdefault("error", startup_error if startup_error else "Unknown startup error")
-        # Raising the exception here will prevent FastAPI from starting fully
         raise RuntimeError(f"Critical startup error: {startup_error}") from e
 
-    # --- Application Runs ---
     logger.info("Yielding control to FastAPI application...")
     yield
     logger.info("FastAPI application finished.")
 
     # --- Shutdown Logic ---
     logger.info(f"{SERVICE_NAME.upper()} Service shutting down...")
-    # Clear context cache first
     if 'utterance_context_cache' in globals():
         logger.info(f"Clearing utterance context cache ({len(globals()['utterance_context_cache'])} items)...")
         globals()['utterance_context_cache'].clear()
         logger.info("Utterance context cache cleared.")
 
-    # Release model resources
     if 'tts_generator' in globals() and globals()['tts_generator']:
         logger.info("Releasing TTS generator instance...")
         try:
-            # If the generator has a specific cleanup method, call it here
-            # if hasattr(globals()['tts_generator'], 'cleanup'):
-            #     globals()['tts_generator'].cleanup()
-            del globals()['tts_generator'] # Remove reference
+            del globals()['tts_generator']
             globals()['tts_generator'] = None
             logger.info("TTS generator instance deleted.")
         except Exception as del_err:
             logger.warning(f"Error deleting generator instance: {del_err}")
 
-    # Clear CUDA cache if GPU was used
     if 'effective_device' in globals() and globals()['effective_device'] and globals()['effective_device'].startswith("cuda"):
         try:
             logger.info("Attempting to clear CUDA cache...")
@@ -375,14 +315,14 @@ async def lifespan(app: FastAPI):
 
     logger.info("TTS Service shutdown complete.")
 
-
 # --- FastAPI App Initialization ---
 app = FastAPI(lifespan=lifespan, title="TTS Streaming Service (CSM - senstella)", version="1.3.1")
 
 
 # --- Helper Functions ---
+# Ensure PCM_16 fix is present
 def numpy_to_base64_wav(audio_np: np.ndarray, samplerate: int) -> str:
-    """Converts a NumPy audio array to a base64 encoded WAV string."""
+    """Converts a NumPy audio array to a base64 encoded WAV string using PCM_16."""
     if not isinstance(audio_np, np.ndarray):
         logger.warning(f"Input not NumPy array (type: {type(audio_np)}). Returning empty string.")
         return ""
@@ -390,21 +330,20 @@ def numpy_to_base64_wav(audio_np: np.ndarray, samplerate: int) -> str:
         logger.warning("Attempted encode empty NumPy array. Returning empty string.")
         return ""
     try:
-        # Ensure float32 for soundfile
         if audio_np.dtype != np.float32:
             audio_np = audio_np.astype(np.float32)
 
-        # Clamp or normalize if values are outside [-1, 1]
         max_val = np.max(np.abs(audio_np))
         if max_val > 1.0:
-            logger.warning(f"Audio data max abs val > 1.0 ({max_val:.3f}). Normalizing.")
+            logger.debug(f"Normalizing audio before writing WAV (max abs val: {max_val:.3f}).")
             audio_np = audio_np / max_val
         elif max_val < 1e-6:
-             logger.warning(f"Audio data seems silent (max abs val: {max_val:.3e}).")
+            logger.warning(f"Audio data seems silent (max abs val: {max_val:.3e}).")
 
         buffer = io.BytesIO()
-        # Write as 32-bit float WAV
-        sf.write(buffer, audio_np, samplerate, format='WAV', subtype='FLOAT')
+        # Use PCM_16 for better browser compatibility
+        logger.debug(f"Writing audio to WAV buffer (PCM_16, {samplerate}Hz)...")
+        sf.write(buffer, audio_np, samplerate, format='WAV', subtype='PCM_16')
         buffer.seek(0)
         wav_bytes = buffer.getvalue()
         b64_string = base64.b64encode(wav_bytes).decode('utf-8')
@@ -414,23 +353,21 @@ def numpy_to_base64_wav(audio_np: np.ndarray, samplerate: int) -> str:
         logger.error(f"Error encoding numpy audio to WAV base64: {e}", exc_info=True)
         return ""
 
-
-# --- WebSocket Endpoint ---
+# --- Main WebSocket Endpoint ---
 @app.websocket("/synthesize_stream")
 async def synthesize_stream_endpoint(websocket: WebSocket):
+    # ... (Keep existing synthesize_stream_endpoint function as is) ...
     """Handles WebSocket for streaming TTS synthesis."""
     client_host = websocket.client.host if websocket.client else "unknown"
     client_port = websocket.client.port if websocket.client else "unknown"
-    logger.info(f"WebSocket connection request from {client_host}:{client_port}")
+    logger.info(f"WebSocket connection request from {client_host}:{client_port} to /synthesize_stream")
 
     await websocket.accept()
-    logger.info(f"WebSocket connection accepted for {client_host}:{client_port}")
+    logger.info(f"WebSocket connection accepted for {client_host}:{client_port} on /synthesize_stream")
 
-    # Check model readiness immediately after accepting
     if not tts_generator or model_load_info.get("status") != "loaded":
         err_msg = model_load_info.get("error", "TTS model is not ready or failed to load.")
         logger.error(f"Rejecting WebSocket connection (post-accept): {err_msg}")
-        # Try to send error before closing
         try:
             await websocket.send_json({"type": "error", "message": err_msg})
         except Exception as send_err:
@@ -439,33 +376,30 @@ async def synthesize_stream_endpoint(websocket: WebSocket):
         return
 
     current_utt = None
-    # Get the loop that this coroutine is running on
     loop = asyncio.get_running_loop()
 
     try:
         while True:
-            # Wait for a message from the client
             try:
                 raw_data = await websocket.receive_text()
                 msg = json.loads(raw_data)
                 logger.debug(f"Received WS message: {msg}")
             except WebSocketDisconnect:
                 logger.info(f"WebSocket client {client_host}:{client_port} disconnected.")
-                break # Exit the loop cleanly
+                break
             except json.JSONDecodeError:
                 logger.warning("Received invalid JSON over WebSocket.")
                 try: await websocket.send_json({"type":"error", "message":"Invalid JSON format"})
-                except: pass # Ignore send errors if client is already gone
-                continue # Wait for next message
+                except: pass
+                continue
             except Exception as e:
                  logger.error(f"Unexpected error receiving WebSocket message: {e}", exc_info=True)
                  try: await websocket.send_json({"type":"error", "message":f"Server error receiving message: {e}"})
                  except: pass
-                 continue # Or break/close depending on severity
+                 continue
 
             msg_type = msg.get("type")
 
-            # Handle context clearing request
             if msg_type == "clear_context":
                  utterance_id_to_clear = msg.get("utterance_id")
                  if utterance_id_to_clear and utterance_id_to_clear in utterance_context_cache:
@@ -475,16 +409,14 @@ async def synthesize_stream_endpoint(websocket: WebSocket):
                       except: pass
                  else:
                       logger.warning(f"Received clear_context for unknown/missing utterance_id: {utterance_id_to_clear}")
-                 continue # Wait for next message
+                 continue
 
-            # Handle generation request
             if msg_type != "generate_chunk":
                 logger.warning(f"Received unknown message type: {msg_type}")
                 try: await websocket.send_json({"type":"error", "message":f"Unknown message type: {msg_type}"})
                 except: pass
-                continue # Wait for next message
+                continue
 
-            # --- Process generate_chunk ---
             text_chunk   = msg.get("text_chunk","").strip()
             utterance_id = msg.get("utterance_id")
             max_len_ms   = float(msg.get("max_audio_length_ms", tts_config.get("max_audio_length_ms", 90000)))
@@ -495,7 +427,6 @@ async def synthesize_stream_endpoint(websocket: WebSocket):
                 except: pass
                 continue
 
-            # Switch context if new utterance_id
             if utterance_id != current_utt:
                  if current_utt and current_utt in utterance_context_cache:
                      logger.warning(f"Switching utterance context from {current_utt} to {utterance_id} without explicit clear.")
@@ -506,8 +437,6 @@ async def synthesize_stream_endpoint(websocket: WebSocket):
                  else:
                       logger.info(f"Reusing existing context cache for utterance_id: {current_utt}")
 
-
-            # Prepare context & params
             context_for_csm = utterance_context_cache.get(current_utt, [])
             effective_sr    = tts_config.get("actual_sample_rate", 24000)
             temp            = float(tts_config.get("temperature", 0.9))
@@ -515,8 +444,7 @@ async def synthesize_stream_endpoint(websocket: WebSocket):
             logger.info(f"Generating chunk for utt_id={current_utt}, speaker={TTS_SPEAKER_ID}, temp={temp}, topk={topk}, context_len={len(context_for_csm)}")
             logger.debug(f"Text chunk: '{text_chunk[:50]}...'")
 
-            # --- MODIFIED CALLBACK with Closure Fix ---
-            def on_chunk_generated(chunk: torch.Tensor, utt_id=current_utt, txt_chunk=text_chunk): # Bind as defaults
+            def on_chunk_generated(chunk: torch.Tensor, utt_id=current_utt, txt_chunk=text_chunk):
                 if not loop.is_running():
                     logger.warning(f"Event loop closed before sending chunk for {utt_id}. Skipping.")
                     return
@@ -532,45 +460,35 @@ async def synthesize_stream_endpoint(websocket: WebSocket):
 
                     coro = websocket.send_json({
                         "type":         "audio_chunk",
-                        "utterance_id": utt_id,      # Use bound utt_id
+                        "utterance_id": utt_id,
                         "audio_b64":    b64,
-                        "text_chunk":   txt_chunk,   # Use bound txt_chunk
+                        "text_chunk":   txt_chunk,
                     })
                     future = asyncio.run_coroutine_threadsafe(coro, loop)
 
                     def log_send_exception(fut):
-                        try:
-                            fut.result(timeout=0)
-                        except Exception as send_exc:
-                            logger.error(f"Error sending audio chunk for {utt_id} via WebSocket: {send_exc}", exc_info=False)
+                        try: fut.result(timeout=0)
+                        except Exception as send_exc: logger.error(f"Error sending audio chunk for {utt_id} via WebSocket: {send_exc}", exc_info=False)
                     future.add_done_callback(log_send_exception)
 
                 except Exception as e_inner:
                      logger.error(f"Error in on_chunk_generated callback for {utt_id}: {e_inner}", exc_info=True)
-            # --- END OF MODIFIED CALLBACK ---
 
-            # Run the blocking generator function in a separate thread
             generation_exception = None
             try:
                 logger.debug(f"Starting generate_stream in thread for {current_utt}...")
                 await asyncio.to_thread(
-                    lambda: list( # Consume the generator to force execution
+                    lambda: list(
                         tts_generator.generate_stream(
-                            text=text_chunk,
-                            speaker=TTS_SPEAKER_ID,
-                            context=context_for_csm,
-                            max_audio_length_ms=max_len_ms,
-                            temperature=temp,
-                            topk=topk,
+                            text=text_chunk, speaker=TTS_SPEAKER_ID, context=context_for_csm,
+                            max_audio_length_ms=max_len_ms, temperature=temp, topk=topk,
                             on_chunk_generated=on_chunk_generated
                         )
                     )
                 )
                 logger.debug(f"generate_stream thread finished for {current_utt}.")
 
-                # Send an explicit stream_end message if the generator finishes without error
                 try:
-                    # Check connection state before sending final message
                     if websocket.client_state == WebSocketState.CONNECTED:
                         await websocket.send_json({"type": "stream_end", "utterance_id": current_utt})
                         logger.info(f"Sent explicit stream_end for {current_utt}.")
@@ -583,7 +501,6 @@ async def synthesize_stream_endpoint(websocket: WebSocket):
                 logger.error(f"Error during TTS generation thread for {current_utt}: {gen_exc}", exc_info=True)
                 generation_exception = gen_exc
 
-            # If generation failed, notify client
             if generation_exception:
                  try:
                      if websocket.client_state == WebSocketState.CONNECTED:
@@ -591,10 +508,8 @@ async def synthesize_stream_endpoint(websocket: WebSocket):
                  except Exception as send_err_exc:
                       logger.error(f"Failed to send generation error message to client for {current_utt}: {send_err_exc}")
 
-            # Append the text segment to context cache if generation didn't fail
             if not generation_exception:
                 try:
-                    # Check if context still exists (might have been cleared by another request)
                     if current_utt in utterance_context_cache:
                         utterance_context_cache[current_utt].append(
                             Segment(text=text_chunk, speaker=TTS_SPEAKER_ID, audio=None)
@@ -605,8 +520,6 @@ async def synthesize_stream_endpoint(websocket: WebSocket):
                 except Exception as append_err:
                      logger.error(f"Error appending segment to context cache for {current_utt}: {append_err}")
 
-
-        # End of while True loop (exited by break on disconnect or error)
         logger.info(f"Exited main WebSocket loop for {client_host}:{client_port}.")
 
     except WebSocketDisconnect:
@@ -614,7 +527,6 @@ async def synthesize_stream_endpoint(websocket: WebSocket):
     except Exception as e:
         logger.error(f"Unhandled error in WebSocket handler for {client_host}:{client_port}: {e}", exc_info=True)
     finally:
-        # Final cleanup
         logger.info(f"Performing final WebSocket cleanup for {client_host}:{client_port}, last utterance: {current_utt}")
         if current_utt and current_utt in utterance_context_cache:
             try:
@@ -634,9 +546,20 @@ async def synthesize_stream_endpoint(websocket: WebSocket):
         else:
             logger.info(f"WebSocket connection already closed for {client_host}:{client_port}")
 
-# --- Health Check Endpoint ---
+# --- WebSocket Health Check Endpoint ---
+@app.websocket("/ws_health")
+async def websocket_health_check(websocket: WebSocket):
+    """Accepts a WebSocket connection and immediately closes it."""
+    await websocket.accept()
+    # Optional: Log the health check connection attempt
+    # logger.debug(f"WebSocket health check connection accepted from {websocket.client.host}:{websocket.client.port}")
+    await websocket.close(code=fastapi_status.WS_1000_NORMAL_CLOSURE)
+    # logger.debug("WebSocket health check connection closed.")
+
+# --- HTTP Health Check Endpoint ---
 @app.get("/health", status_code=fastapi_status.HTTP_200_OK)
 async def health_check():
+    # ... (Keep existing health_check implementation as is) ...
     current_status = model_load_info.get("status", "unknown")
     is_healthy = (current_status == "loaded" and tts_generator is not None)
     response_content = {
@@ -656,7 +579,6 @@ async def health_check():
         if model_load_info.get("error"):
              response_content["details"]["error_message"] = model_load_info.get("error")
     else:
-        # Optional: Add a quick check on the generator if healthy
         try:
             _ = tts_generator.device
             _ = tts_generator.sample_rate
@@ -665,15 +587,14 @@ async def health_check():
             logger.error(f"Health check failed accessing generator properties: {gen_check_err}", exc_info=True)
             response_content["status"] = "error"
             response_content["details"]["error_details"] = f"Generator access error: {gen_check_err}"
-            # Update global status if generator becomes inaccessible at runtime
             model_load_info["status"] = "error_runtime_access"
             model_load_info["error"] = f"Generator access error: {gen_check_err}"
             status_code = fastapi_status.HTTP_503_SERVICE_UNAVAILABLE
 
     return JSONResponse(status_code=status_code, content=response_content)
 
-
 # --- Main Execution Guard ---
+# ... (Keep existing __main__ block as is) ...
 if __name__ == "__main__":
     logger.info(f"Starting {SERVICE_NAME.upper()} service directly via __main__...")
     main_startup_error = None
@@ -696,7 +617,6 @@ if __name__ == "__main__":
              model_load_info.update({"status": "error", "error": main_startup_error}) # Ensure status reflects this
              raise RuntimeError(main_startup_error)
 
-        # Perform warmup manually if running directly
         if tts_generator and model_load_info.get("status") == "loaded":
             logger.info("Attempting direct run warm-up...")
             try:
@@ -710,12 +630,10 @@ if __name__ == "__main__":
         log_level_param = LOG_LEVEL.lower()
         logger.info(f"Direct run startup successful. Launching Uvicorn on {host}:{port}...")
         import uvicorn
-        # Note: Lifespan won't run again when using uvicorn.run this way,
-        # startup logic is handled above.
         uvicorn.run("app:app", host=host, port=port, log_level=log_level_param, reload=False)
 
     except RuntimeError as e:
-        logger.critical(f"Direct run failed during startup: {e}", exc_info=False) # Keep log cleaner for expected startup fails
+        logger.critical(f"Direct run failed during startup: {e}", exc_info=False)
         exit(1)
     except ImportError as e:
         logger.critical(f"Direct run failed: Missing dependency? {e}", exc_info=True)
@@ -725,7 +643,6 @@ if __name__ == "__main__":
         exit(1)
     finally:
         logger.info(f"{SERVICE_NAME.upper()} Service shutting down (direct run)...")
-        # Manual cleanup similar to lifespan shutdown, as lifespan's yield won't be reached
         if 'tts_generator' in globals() and globals()['tts_generator']:
             del globals()['tts_generator']
             globals()['tts_generator'] = None
