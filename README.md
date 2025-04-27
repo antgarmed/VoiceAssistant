@@ -5,7 +5,7 @@ TLDR Setup:
 Install and run docker
 Request access to Llama 3.2 1b and acquire huggingface key (then replace in .env file)
 Install dependencies (rust, Tauri, Nvidia Container Toolkit)
-Build backend then run, start frontend 
+Build backend (docker compose build) then run (docker compose up), start frontend (npm run tauri dev) from the frontend directory
 
 This project provides a high-performance, local voice assistant featuring real-time transcription, LLM reasoning, text-to-speech, and a cross-platform GUI built with **Tauri 2.x** and **React**. It runs fully offline after setup, ensuring privacy, speed, and GPU acceleration. It features the new **Sesame CSM** model for expressive, local speech synthesis.
 
