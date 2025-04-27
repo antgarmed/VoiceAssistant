@@ -22,7 +22,28 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     git \
     curl \
- && rm -rf /var/lib/apt/lists/* # Added curl here
+ && rm -rf /var/lib/apt/lists/*
+
+# --- START: Added websocat installation ---
+ARG WEBSOCAT_VERSION=1.13.0
+ARG TARGETARCH # Docker buildx automatically sets this (e.g., amd64, arm64)
+
+# Install wget and ca-certificates if needed for download
+RUN apt-get update && apt-get install -y --no-install-recommends wget ca-certificates && rm -rf /var/lib/apt/lists/*
+
+# Download and install websocat based on architecture
+RUN case ${TARGETARCH} in \
+        amd64)   WEBSOCAT_ARCH="x86_64-unknown-linux-musl" ;; \
+        arm64)   WEBSOCAT_ARCH="aarch64-unknown-linux-musl" ;; \
+        # Add other architectures if needed, e.g. arm/v7 \
+        *) echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
+    esac && \
+    wget -q "https://github.com/vi/websocat/releases/download/v${WEBSOCAT_VERSION}/websocat.${WEBSOCAT_ARCH}" -O /usr/local/bin/websocat && \
+    chmod +x /usr/local/bin/websocat && \
+    # Verify installation (optional)
+    websocat --version
+# --- END: Added websocat installation ---
+
 
 # Create and activate virtual environment
 ENV VENV_PATH=/app/.venv
@@ -51,11 +72,9 @@ RUN . ${VENV_PATH}/bin/activate && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-# Ensure these paths match your project structure relative to backend/tts
 COPY csm_utils ./csm_utils
 COPY generator.py models.py ./
 COPY app.py .
-# COPY config.yaml . # Optional: copy default config if needed, volume mount usually preferred
 
 # Create logs directory and set permissions
 ENV LOG_DIR=/app/logs
@@ -71,5 +90,5 @@ USER ${USERNAME}:${GROUPNAME}
 EXPOSE 5003
 
 # Default command (can be overridden by docker-compose)
-# Ensure HF_TOKEN is passed as env var by docker-compose
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5003"]
+
