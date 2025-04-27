@@ -2,7 +2,7 @@
 # A functioning Sesame CSM project - Real-time factor: 0.647x with 4070 Ti Super
 
 TLDR Setup:
-Install and run docker
+Install and run docker desktop
 Request access to Llama 3.2 1b and acquire huggingface key (then replace in .env file)
 Install dependencies (rust, Tauri, Nvidia Container Toolkit)
 Build backend (docker compose build) then run (docker compose up), start frontend (npm run tauri dev) from the frontend directory
