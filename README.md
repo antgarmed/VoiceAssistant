@@ -1,5 +1,5 @@
 ```
-# Local Voice Assistant
+# Local Voice Assistant - A functioning Sesame CSM project
 
 This project provides a high-performance, local voice assistant featuring real-time transcription, LLM reasoning, text-to-speech, and a cross-platform GUI built with **Tauri 2.x** and **React**. It runs fully offline after setup, ensuring privacy, speed, and GPU acceleration. It features the new **Sesame CSM** model for expressive, local speech synthesis.
 
