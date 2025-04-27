@@ -1,5 +1,5 @@
 ```
-# A functioning Sesame CSM project - Real-time factor: 0.647x with 4070 Ti Super
+# A functioning Sesame CSM project - Real-time factor: 0.6x with 4070 Ti Super
 
 TLDR Setup:
 Install and run docker desktop
@@ -20,7 +20,7 @@ Features
 - GPU Acceleration: Uses CUDA for speed and performance
 - Modular Backend: ASR, LLM, TTS, and orchestrator in Docker containers
 - Auto Model Downloads: Models downloaded at first launch from Hugging Face
-- Real-time factor: 0.647x with 4070 Ti Super
+- Real-time factor: 0.6x with 4070 Ti Super
 
 Tech Stack
 
