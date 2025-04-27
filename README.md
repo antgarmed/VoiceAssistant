@@ -133,7 +133,7 @@ Llama 3.2 1b is a gated repo, you must request and be given access to acquire it
 You will need these if you don't have them already:
 npm install
 cargo install tauri-cli
-
+npm install uuid
 
 TLDR Setup:
 Install and run docker
