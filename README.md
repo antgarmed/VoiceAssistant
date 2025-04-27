@@ -1,5 +1,5 @@
 ```
-# Local Voice Assistant - A functioning Sesame CSM project
+# Local Voice Assistant - A functioning Sesame CSM project - Real-time factor: 0.647x with 4070 Ti Super
 
 This project provides a high-performance, local voice assistant featuring real-time transcription, LLM reasoning, text-to-speech, and a cross-platform GUI built with **Tauri 2.x** and **React**. It runs fully offline after setup, ensuring privacy, speed, and GPU acceleration. It features the new **Sesame CSM** model for expressive, local speech synthesis.
 
@@ -14,6 +14,7 @@ Features
 - GPU Acceleration: Uses CUDA for speed and performance
 - Modular Backend: ASR, LLM, TTS, and orchestrator in Docker containers
 - Auto Model Downloads: Models downloaded at first launch from Hugging Face
+- Real-time factor: 0.647x with 4070 Ti Super
 
 Tech Stack
 
