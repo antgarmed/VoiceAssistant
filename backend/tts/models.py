@@ -1,192 +1,198 @@
-# backend/tts/models.py
-# --- FINAL VERSION incorporating enumerate fix for setup_caches ---
-# (Using torchtune 0.4.0)
-
+import logging
 from dataclasses import dataclass
-from typing import Tuple # Correct import
 
 import torch
 import torch.nn as nn
 import torchtune
 from huggingface_hub import PyTorchModelHubMixin
-from torchtune.models import llama3
+from torchtune.models import llama3_2
 
-# --- Function definitions for model flavors ---
+logger = logging.getLogger(__name__)
+
 def llama3_2_1B() -> torchtune.modules.transformer.TransformerDecoder:
-    """Defines the Llama3.2 1B architecture variant with GQA."""
-    return llama3.llama3(
+    return llama3_2.llama3_2(
         vocab_size=128_256,
         num_layers=16,
-        num_heads=32,       # Query heads
-        num_kv_heads=8,     # Key/Value heads (GQA)
+        num_heads=32,
+        num_kv_heads=8,
         embed_dim=2048,
         max_seq_len=2048,
         intermediate_dim=8192,
         attn_dropout=0.0,
         norm_eps=1e-5,
         rope_base=500_000,
+        scale_factor=32,
     )
 
 def llama3_2_100M() -> torchtune.modules.transformer.TransformerDecoder:
-    """Defines the Llama3.2 100M architecture variant (Decoder)."""
-    # Corrected based on checkpoint loading errors: uses GQA
-    return llama3.llama3(
+    return llama3_2.llama3_2(
         vocab_size=128_256,
         num_layers=4,
-        num_heads=8,        # Query heads
-        num_kv_heads=2,     # CORRECTED based on K/V proj shape error -> GQA
+        num_heads=8,
+        num_kv_heads=2,
         embed_dim=1024,
         max_seq_len=2048,
-        intermediate_dim=8192, # Verify this intermediate dim for 100M size
+        intermediate_dim=8192,
         attn_dropout=0.0,
         norm_eps=1e-5,
         rope_base=500_000,
+        scale_factor=32,
     )
 
 FLAVORS = {
     "llama-1B": llama3_2_1B,
-    "llama-100M": llama3_2_100M, # Points to the corrected 100M definition
+    "llama-100M": llama3_2_100M,
 }
 
-# --- _prepare_transformer Function ---
-def _prepare_transformer(model: torchtune.modules.transformer.TransformerDecoder) -> Tuple[torchtune.modules.transformer.TransformerDecoder, int]:
-    """
-    Prepares a torchtune TransformerDecoder for use in CSM:
-    1. Replaces the token embeddings layer with Identity.
-    2. Replaces the final output projection layer with Identity.
-    Returns the modified model and its embedding dimension.
-    """
+def _prepare_transformer(model):
     embed_dim = model.tok_embeddings.embedding_dim
     model.tok_embeddings = nn.Identity()
     model.output = nn.Identity()
-    print(f"Prepared transformer: Replaced tok_embeddings and output with nn.Identity(). Embed Dim: {embed_dim}")
     return model, embed_dim
 
+def _create_causal_mask(seq_len: int, device: torch.device):
+    return torch.tril(torch.ones(seq_len, seq_len, dtype=torch.bool, device=device))
+
+def _index_causal_mask(mask: torch.Tensor, input_pos: torch.Tensor):
+    """
+    Args:
+        mask: (max_seq_len, max_seq_len)
+        input_pos: (batch_size, seq_len)
+
+    Returns:
+        (batch_size, seq_len, max_seq_len)
+    """
+    r = mask[input_pos, :]
+    return r
+
+def _multinomial_sample_one_no_sync(probs):  # Does multinomial sampling without a cuda synchronization
+    q = torch.empty_like(probs).exponential_(1)
+    return torch.argmax(probs / q, dim=-1, keepdim=True).to(dtype=torch.int)
+
+def sample_topk(logits: torch.Tensor, topk: int, temperature: float):
+    logits = logits / temperature
+
+    filter_value: float = -float("Inf")
+    indices_to_remove = logits < torch.topk(logits, topk)[0][..., -1, None]
+    scores_processed = logits.masked_fill(indices_to_remove, filter_value)
+    scores_processed = torch.nn.functional.log_softmax(scores_processed, dim=-1)
+    probs = torch.nn.functional.softmax(scores_processed, dim=-1)
+
+    sample_token = _multinomial_sample_one_no_sync(probs)
+    return sample_token
 
 @dataclass
 class ModelArgs:
-    """Configuration arguments for the CSM Model."""
     backbone_flavor: str
     decoder_flavor: str
     text_vocab_size: int
-    audio_vocab_size: int # Should be 2051 (set by generator.py)
+    audio_vocab_size: int
     audio_num_codebooks: int
 
 
-# --- Model Class Definition ---
-class Model(nn.Module, PyTorchModelHubMixin):
-    """
-    The CSM Model architecture. Contains backbone, decoder, embeddings, projection, heads.
-    The generation logic (generate_frame) resides in the Generator class.
-    """
+class Model(
+    nn.Module,
+    PyTorchModelHubMixin,
+    repo_url="https://github.com/SesameAILabs/csm",
+    pipeline_tag="text-to-speech",
+    license="apache-2.0",
+):
     def __init__(self, config: ModelArgs):
         super().__init__()
         self.config = config
 
-        self.backbone, self.backbone_dim = _prepare_transformer(FLAVORS[config.backbone_flavor]())
-        self.decoder, self.decoder_dim = _prepare_transformer(FLAVORS[config.decoder_flavor]())
+        self.backbone, backbone_dim = _prepare_transformer(FLAVORS[config.backbone_flavor]())
+        self.decoder, decoder_dim = _prepare_transformer(FLAVORS[config.decoder_flavor]())
 
-        self.text_embeddings = nn.Embedding(config.text_vocab_size, self.backbone_dim)
-        self.audio_embeddings = nn.Embedding(config.audio_vocab_size * config.audio_num_codebooks, self.backbone_dim)
-        self.projection = nn.Linear(self.backbone_dim, self.decoder_dim, bias=False)
-        self.codebook0_head = nn.Linear(self.backbone_dim, config.audio_vocab_size, bias=False)
-        self.audio_head = nn.Parameter(
-            torch.empty(config.audio_num_codebooks - 1, self.decoder_dim, config.audio_vocab_size)
-        )
-        nn.init.normal_(self.audio_head, mean=0.0, std=0.02)
+        self.text_embeddings = nn.Embedding(config.text_vocab_size, backbone_dim)
+        self.audio_embeddings = nn.Embedding(config.audio_vocab_size * config.audio_num_codebooks, backbone_dim)
 
-        print("CSM Model Initialized:")
-        print(f"  Backbone: {config.backbone_flavor}, Dim: {self.backbone_dim}")
-        print(f"  Decoder: {config.decoder_flavor}, Dim: {self.decoder_dim}")
-        print(f"  Text Embeddings: {config.text_vocab_size} -> {self.backbone_dim}")
-        print(f"  Audio Embeddings: {self.audio_embeddings.num_embeddings} ({config.audio_num_codebooks}x{config.audio_vocab_size}) -> {self.backbone_dim}")
-        print(f"  Codebook0 Head Out Dim: {self.codebook0_head.out_features}")
-        print(f"  Audio Head Shape: {self.audio_head.shape}")
+        self.projection = nn.Linear(backbone_dim, decoder_dim, bias=False)
+        self.codebook0_head = nn.Linear(backbone_dim, config.audio_vocab_size, bias=False)
+        self.audio_head = nn.Parameter(torch.empty(config.audio_num_codebooks - 1, decoder_dim, config.audio_vocab_size))
 
-    # --- setup_caches METHOD (Corrected enumerate for backbone loop) ---
-    def setup_caches(self, batch_size: int, dtype: torch.dtype) -> None:
-        """Sets up KV caches for backbone and decoder and ensures they are on the correct device."""
+    def setup_caches(self, max_batch_size: int) -> torch.Tensor:
+        """Setup KV caches and return a causal mask."""
+        dtype = next(self.parameters()).dtype
         device = next(self.parameters()).device
-        print(f"Attempting setup_caches with batch_size={batch_size}, dtype={dtype}, device={device}")
-        backbone_max_seq_len = getattr(self.backbone, 'max_seq_len', 2048)
-        decoder_max_seq_len = getattr(self.decoder, 'max_seq_len', 2048)
-        print(f"  (Info) Backbone max_seq_len: {backbone_max_seq_len}")
-        print(f"  (Info) Decoder max_seq_len: {decoder_max_seq_len}")
 
-        try:
-            # Call torchtune's setup_caches
-            if hasattr(self.backbone, 'setup_caches') and callable(self.backbone.setup_caches):
-                print(f"  Calling self.backbone.setup_caches(batch_size={batch_size}, dtype={dtype})")
-                self.backbone.setup_caches(batch_size=batch_size, dtype=dtype)
-            else:
-                print("  Warning: self.backbone does not have a callable setup_caches method.")
+        with device:
+            self.backbone.setup_caches(max_batch_size, dtype)
+            self.decoder.setup_caches(max_batch_size, dtype, decoder_max_seq_len=self.config.audio_num_codebooks)
 
-            if hasattr(self.decoder, 'setup_caches') and callable(self.decoder.setup_caches):
-                print(f"  Calling self.decoder.setup_caches(batch_size={batch_size}, dtype={dtype})")
-                self.decoder.setup_caches(batch_size=batch_size, dtype=dtype)
-            else:
-                print("  Warning: self.decoder does not have a callable setup_caches method.")
-            print("Internal setup_caches calls completed.")
+        self.register_buffer("backbone_causal_mask", _create_causal_mask(self.backbone.max_seq_len, device))
+        self.register_buffer("decoder_causal_mask", _create_causal_mask(self.config.audio_num_codebooks, device))
 
-            # --- BEGIN MANUAL CACHE TENSOR DEVICE FIX ---
-            print(f"Manually moving cache tensors to device: {device}...")
-            moved_count = 0
-            # Iterate through backbone layers using enumerate
-            if hasattr(self.backbone, 'layers'):
-                # CORRECTED: Added enumerate here
-                for layer_idx, layer in enumerate(self.backbone.layers):
-                    if hasattr(layer, 'attn') and hasattr(layer.attn, 'kv_cache'):
-                        kv_cache = layer.attn.kv_cache
-                        # Check k_cache
-                        if kv_cache.k_cache is not None and kv_cache.k_cache.device != device:
-                             print(f"    Moving backbone layer {layer_idx} k_cache from {kv_cache.k_cache.device} to {device}")
-                             kv_cache.k_cache = kv_cache.k_cache.to(device=device)
-                             moved_count += 1
-                        # Check v_cache
-                        if kv_cache.v_cache is not None and kv_cache.v_cache.device != device:
-                             print(f"    Moving backbone layer {layer_idx} v_cache from {kv_cache.v_cache.device} to {device}")
-                             kv_cache.v_cache = kv_cache.v_cache.to(device=device)
-                             moved_count += 1
-                        # Check/move cache_pos
-                        if hasattr(kv_cache, 'cache_pos') and isinstance(kv_cache.cache_pos, torch.Tensor):
-                            if kv_cache.cache_pos.device != device:
-                                print(f"    Moving backbone layer {layer_idx} cache_pos from {kv_cache.cache_pos.device} to {device}")
-                                kv_cache.cache_pos = kv_cache.cache_pos.to(device=device)
-                                moved_count += 1
+    def generate_frame(
+        self,
+        tokens: torch.Tensor,
+        tokens_mask: torch.Tensor,
+        input_pos: torch.Tensor,
+        temperature: float,
+        topk: int,
+    ) -> torch.Tensor:
+        """
+        Args:
+            tokens: (batch_size, seq_len, audio_num_codebooks+1)
+            tokens_mask: (batch_size, seq_len, audio_num_codebooks+1)
+            input_pos: (batch_size, seq_len) positions for each token
+            mask: (batch_size, seq_len, max_seq_len
 
-            # Iterate through decoder layers (already had enumerate)
-            if hasattr(self.decoder, 'layers'):
-                 for layer_idx, layer in enumerate(self.decoder.layers):
-                      if hasattr(layer, 'attn') and hasattr(layer.attn, 'kv_cache'):
-                           kv_cache = layer.attn.kv_cache
-                           # Check k_cache
-                           if kv_cache.k_cache is not None and kv_cache.k_cache.device != device:
-                                print(f"    Moving decoder layer {layer_idx} k_cache from {kv_cache.k_cache.device} to {device}")
-                                kv_cache.k_cache = kv_cache.k_cache.to(device=device)
-                                moved_count += 1
-                           # Check v_cache
-                           if kv_cache.v_cache is not None and kv_cache.v_cache.device != device:
-                                print(f"    Moving decoder layer {layer_idx} v_cache from {kv_cache.v_cache.device} to {device}")
-                                kv_cache.v_cache = kv_cache.v_cache.to(device=device)
-                                moved_count += 1
-                           # Check/move cache_pos
-                           if hasattr(kv_cache, 'cache_pos') and isinstance(kv_cache.cache_pos, torch.Tensor):
-                               if kv_cache.cache_pos.device != device:
-                                   print(f"    Moving decoder layer {layer_idx} cache_pos from {kv_cache.cache_pos.device} to {device}")
-                                   kv_cache.cache_pos = kv_cache.cache_pos.to(device=device)
-                                   moved_count += 1
+        Returns:
+            (batch_size, audio_num_codebooks) sampled tokens
+        """
+        dtype = next(self.parameters()).dtype
+        b, s, _ = tokens.size()
 
-            print(f"Manual cache tensor moving complete. Moved {moved_count} tensors.")
-            # --- END MANUAL CACHE TENSOR DEVICE FIX ---
+        assert self.backbone.caches_are_enabled(), "backbone caches are not enabled"
+        curr_backbone_mask = _index_causal_mask(self.backbone_causal_mask, input_pos)
+        embeds = self._embed_tokens(tokens)
+        masked_embeds = embeds * tokens_mask.unsqueeze(-1)
+        h = masked_embeds.sum(dim=2)
+        h = self.backbone(h, input_pos=input_pos, mask=curr_backbone_mask).to(dtype=dtype)
 
-        except Exception as e: # Catch any exception during setup
-             print(f"ERROR during setup_caches: {type(e).__name__}: {e}")
-             # Reraise to stop the application startup correctly
-             raise RuntimeError(f"Failed setup_caches with batch_size={batch_size}, dtype={dtype}") from e
+        last_h = h[:, -1, :]
+        c0_logits = self.codebook0_head(last_h)
+        c0_sample = sample_topk(c0_logits, topk, temperature)
+        c0_embed = self._embed_audio(0, c0_sample)
 
-    # --- forward METHOD (Not used for inference via Generator) ---
-    def forward(self, *args, **kwargs):
-        """Defines the forward pass for training (not used by Generator)."""
-        raise NotImplementedError("Direct forward pass is not implemented for inference via Generator. Use Generator.generate().")
+        curr_h = torch.cat([last_h.unsqueeze(1), c0_embed], dim=1)
+        curr_sample = c0_sample.clone()
+        curr_pos = torch.arange(0, curr_h.size(1), device=curr_h.device).unsqueeze(0).repeat(curr_h.size(0), 1)
 
-# --- END models.py ---
+        # Decoder caches must be reset every frame.
+        self.decoder.reset_caches()
+        for i in range(1, self.config.audio_num_codebooks):
+            curr_decoder_mask = _index_causal_mask(self.decoder_causal_mask, curr_pos)
+            decoder_h = self.decoder(self.projection(curr_h), input_pos=curr_pos, mask=curr_decoder_mask).to(
+                dtype=dtype
+            )
+            ci_logits = torch.mm(decoder_h[:, -1, :], self.audio_head[i - 1])
+            ci_sample = sample_topk(ci_logits, topk, temperature)
+            ci_embed = self._embed_audio(i, ci_sample)
+
+            curr_h = ci_embed
+            curr_sample = torch.cat([curr_sample, ci_sample], dim=1)
+            curr_pos = curr_pos[:, -1:] + 1
+
+        return curr_sample
+
+    def reset_caches(self):
+        self.backbone.reset_caches()
+        self.decoder.reset_caches()
+
+    def _embed_audio(self, codebook: int, tokens: torch.Tensor) -> torch.Tensor:
+        return self.audio_embeddings(tokens + codebook * self.config.audio_vocab_size)
+
+    def _embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
+        text_embeds = self.text_embeddings(tokens[:, :, -1]).unsqueeze(-2)
+
+        audio_tokens = tokens[:, :, :-1] + (
+            self.config.audio_vocab_size * torch.arange(self.config.audio_num_codebooks, device=tokens.device)
+        )
+        audio_embeds = self.audio_embeddings(audio_tokens.view(-1)).reshape(
+            tokens.size(0), tokens.size(1), self.config.audio_num_codebooks, -1
+        )
+
+        return torch.cat([audio_embeds, text_embeds], dim=-2)
+    
