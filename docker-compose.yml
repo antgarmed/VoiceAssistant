@@ -1,6 +1,4 @@
 # voice-assistant/docker-compose.yml
-# Corrected depends_on and removed sleep from tts
-
 services:
   asr:
     build:
@@ -89,14 +87,13 @@ services:
       context: ./backend/tts
       dockerfile: Dockerfile
     container_name: voice-assistant-tts
-    # REMOVED 'command: ["sleep", "infinity"]' - It will now run the app.py CMD/ENTRYPOINT
     ports:
       - "${TTS_PORT}:${TTS_PORT}"
     volumes:
       - ./shared/config.yaml:/app/config.yaml:ro
       - ./shared/logs:/app/logs
       - model_cache:${CACHE_DIR:-/cache}
-    environment:
+    environment: # <<< SECTION WITH CHANGE
       - TTS_PORT=${TTS_PORT}
       - CACHE_DIR=${CACHE_DIR:-/cache}
       - USE_GPU=${USE_GPU} # Should be true or auto for CSM
@@ -105,10 +102,11 @@ services:
       - CONFIG_PATH=/app/config.yaml
       - LOG_FILE_BASE=/app/logs/service
       - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN} # REQUIRED
-      - NO_TORCH_COMPILE=${NO_TORCH_COMPILE:-1} # Important for CSM's Mimi dependency
+      - NO_TORCH_COMPILE=1                       # <<< THIS LINE IS ADDED/ENSURED
       - TTS_SPEAKER_ID=${TTS_SPEAKER_ID:-4}     # Default to 4 for expressiva model
       - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - HF_HOME=${CACHE_DIR:-/cache}/huggingface # Explicitly set HF_HOME
     deploy:
       resources:
         reservations:
@@ -120,12 +118,12 @@ services:
     networks:
       - voice-assistant-net
     restart: unless-stopped
-    healthcheck: # Healthcheck should now work if app starts correctly
+    healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:${TTS_PORT}/health"]
       interval: 30s
       timeout: 20s
       retries: 5
-      start_period: 300s # Keep long start period, CSM loading is slow
+      start_period: 300s
 
   orchestrator:
     build:
@@ -141,7 +139,7 @@ services:
       - ORCHESTRATOR_PORT=${ORCHESTRATOR_PORT}
       - ASR_SERVICE_URL=http://asr:${ASR_PORT}
       - LLM_SERVICE_URL=http://llm:${LLM_PORT}
-      - TTS_SERVICE_URL=http://tts:${TTS_PORT} # Base HTTP URL for TTS service
+      - TTS_SERVICE_URL=http://tts:${TTS_PORT}
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
       - CONFIG_PATH=/app/config.yaml
@@ -151,8 +149,8 @@ services:
         condition: service_healthy
       llm:
         condition: service_healthy
-      tts: # CORRECTED DEPENDENCY FORMAT
-        condition: service_healthy # Restore the healthcheck dependency
+      tts:
+        condition: service_healthy
     networks:
       - voice-assistant-net
     restart: unless-stopped
@@ -161,12 +159,13 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 10s # Orchestrator starts quickly once dependencies are met
+      start_period: 10s
 
 networks:
   voice-assistant-net:
     driver: bridge
 
 volumes:
-  model_cache: # Unified cache for all downloaded models
+  model_cache:
     driver: local
+
