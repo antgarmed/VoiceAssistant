@@ -123,7 +123,7 @@ Prerequisites
 - Tauri CLI & dependencies: https://tauri.app/v1/guides/getting-started/prerequisites or cargo install tauri-cli
 
 Min specs:
-GPU: Nvidia with 8GB+ VRAM CUDA Version 12.1.1+
+GPU: Nvidia with 8GB+ VRAM
 RAM: 32 GB RAM
 OS: Windows or Linux
 
