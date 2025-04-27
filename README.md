@@ -236,3 +236,14 @@ But your TTS server never sends either.
 Thus, the orchestrator and client hang waiting for either audio or stream end, until timeout.
 
 The system is correctly architected. The error lies in an unguarded edge-case when CSM fails to generate meaningful audio quickly for very short prompts.
+
+
+Look into:
+
+➔ Enable "dynamic shapes" in torch.compile
+🔥 What it does:
+Tells PyTorch to optimize even when input sizes vary (which they do in TTS – different text lengths = different audio durations).
+
+Without it, torch.compile can be a little conservative (less aggressive optimizations).
+
+With it, performance can improve another 5–15%, sometimes even more.
