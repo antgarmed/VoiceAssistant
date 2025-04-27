@@ -272,4 +272,11 @@ Beam width: if using >1, lower it to 1.
 
 Current Issue:
 
-**MicrophoneButton unmount: cleaning up resources.** - this is happening prematurely 
+**MicrophoneButton unmount: cleaning up resources.** - this is happening prematurely . generating multiple chunks of audio but only playing the first.
+
+voice-assistant-tts           | Generated 100 frames (8.00s of audio)
+voice-assistant-orchestrator  | INFO:     127.0.0.1:46156 - "GET /health HTTP/1.1" 200 OK
+voice-assistant-tts           | Generated 200 frames (16.00s of audio)
+voice-assistant-tts           | Total time: 12.32s
+voice-assistant-tts           | Generated 250 frames (20.00s of audio)
+voice-assistant-tts           | Real-time factor: 0.616x (target: <1.0)
