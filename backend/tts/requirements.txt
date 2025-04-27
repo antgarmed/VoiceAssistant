@@ -1,18 +1,13 @@
 # backend/tts/requirements.txt
-# Based *exactly* on the screenshot of SesameAILabs/csm/requirements.txt
 
 torch==2.4.0
 torchaudio==2.4.0
 tokenizers==0.21.0
 transformers==4.49.0
-huggingface_hub==0.28.1 # Using the version from the repo screenshot
-moshi==0.2.2           # Using the version from the repo screenshot
+huggingface_hub==0.28.1
+moshi==0.2.2       
 torchtune==0.4.0
-torchao==0.9.0         # Using the version from the repo screenshot
-# silentcipher @ git+https://github.com/SesameAILabs/silentcipher@master # Keep commented, install manually if needed
-
-# Adding back other dependencies likely required by the FastAPI app/Mimi loader, etc.
-# Keep versions consistent where possible, ensure compatibility.
+torchao==0.9.0 
 fastapi>=0.110.0,<0.112.0
 uvicorn[standard]>=0.29.0,<0.30.0
 python-dotenv>=1.0.0
@@ -20,13 +15,13 @@ PyYAML>=6.0
 pydantic>=2.0.0,<3.0.0
 websockets>=12.0
 encodec>=0.1.1 # Needed for Mimi/audio tokenizer
-einops>=0.7.0  # Often a dependency
+einops>=0.7.0
 librosa>=0.10.0
 soundfile>=0.12.1
 numpy>=1.24.0,<2.0.0
 httpx>=0.27.0
 safetensors>=0.4.1
-av>=10.0.0 # Likely needed by torchaudio/ffmpeg interactions
+av>=10.0.0 
 
 # NOTE: Ensure your Python version is compatible (e.g., 3.10 as mentioned in CSM README)
 # NOTE: Ensure CUDA version matches (e.g., CUDA 12.1+ for torch 2.4.0+cu121)
