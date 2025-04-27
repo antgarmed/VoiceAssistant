@@ -12,7 +12,7 @@ This project provides a high-performance, local voice assistant featuring real-t
 Features
 
 - Real-time Speech-to-Text (ASR): Fast transcription using `faster-whisper`
-- Local Large Language Model (LLM): On-device response generation using Llama 3.2 1B
+- Large Language Model (LLM): On-device response generation using Llama 3.2 1B
 - Natural Text-to-Speech (TTS): output via Sesame CSM fine-tune `senstella/csm-expressiva-1b`
 - Desktop GUI: Built with Tauri and React
 - Speaking Animations: Visual feedback when speaking
