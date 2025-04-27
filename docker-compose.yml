@@ -85,6 +85,7 @@ services:
   tts:
     build:
       context: ./backend/tts
+      # Ensure the Dockerfile includes websocat installation
       dockerfile: Dockerfile
     container_name: voice-assistant-tts
     ports:
@@ -93,7 +94,7 @@ services:
       - ./shared/config.yaml:/app/config.yaml:ro
       - ./shared/logs:/app/logs
       - model_cache:${CACHE_DIR:-/cache}
-    environment: # <<< SECTION WITH CHANGE
+    environment:
       - TTS_PORT=${TTS_PORT}
       - CACHE_DIR=${CACHE_DIR:-/cache}
       - USE_GPU=${USE_GPU} # Should be true or auto for CSM
@@ -102,8 +103,8 @@ services:
       - CONFIG_PATH=/app/config.yaml
       - LOG_FILE_BASE=/app/logs/service
       - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN} # REQUIRED
-      - NO_TORCH_COMPILE=1                       # <<< THIS LINE IS ADDED/ENSURED
-      - TTS_SPEAKER_ID=${TTS_SPEAKER_ID:-4}     # Default to 4 for expressiva model
+      - NO_TORCH_COMPILE=1 # Keep if using pre-compiled models or avoiding compile issues
+      - TTS_SPEAKER_ID=${TTS_SPEAKER_ID:-4} # Default to 4 for expressiva model
       - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       - HF_HOME=${CACHE_DIR:-/cache}/huggingface # Explicitly set HF_HOME
@@ -118,12 +119,20 @@ services:
     networks:
       - voice-assistant-net
     restart: unless-stopped
+    # --- UPDATED HEALTHCHECK SECTION for TTS using /ws_health ---
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:${TTS_PORT}/health"]
-      interval: 30s
-      timeout: 20s
-      retries: 5
-      start_period: 300s
+      test: >
+        sh -c '
+          curl --fail -s http://localhost:${TTS_PORT}/health &&
+          websocat -q --one-message ws://localhost:${TTS_PORT}/ws_health
+        '
+        # -q: quiet mode
+        # --one-message: waits for exactly one message OR EOF (which /ws_health sends immediately after accept)
+      interval: 15s   # Check slightly more often
+      timeout: 10s    # Overall timeout for the sh -c command
+      retries: 6      # Increase retries slightly
+      start_period: 300s # Keep long start period for model loading
+    # --- END OF UPDATED HEALTHCHECK ---
 
   orchestrator:
     build:
@@ -144,7 +153,7 @@ services:
       - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
       - CONFIG_PATH=/app/config.yaml
       - LOG_FILE_BASE=/app/logs/service
-    depends_on:
+    depends_on: # This correctly waits for the updated healthcheck now
       asr:
         condition: service_healthy
       llm:
@@ -159,7 +168,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 10s
+      start_period: 10s # Orchestrator itself starts fast
 
 networks:
   voice-assistant-net:
@@ -168,4 +177,3 @@ networks:
 volumes:
   model_cache:
     driver: local
-
