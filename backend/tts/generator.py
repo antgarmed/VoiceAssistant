@@ -1,466 +1,986 @@
-# backend/tts/generator.py
-# --- FINAL VERSION - Applying Encodec decode fix and cleanup ---
-# TODO: restore causal masks for prod quality after confirming mask=None works
-
 from dataclasses import dataclass
-from typing import List, Tuple, Optional
-import json
 import os
+from typing import List, Tuple, Generator as PyGenerator, Optional, Callable
 import time
-
+import queue
+import threading
+import platform
+from typing_extensions import OrderedDict
+import wave
+import numpy as np
 import torch
-import torch.nn as nn
-# import torchaudio # Removed unused import
+import torchaudio
 from huggingface_hub import hf_hub_download
-import models
-import csm_utils.loader as loaders
-# from tokenizers.processors import TemplateProcessing # Removed unused import
+from models import Model, ModelArgs
+from moshi.models import loaders
+from tokenizers.processors import TemplateProcessing
 from transformers import AutoTokenizer
+import logging
 from safetensors import safe_open
-from models import ModelArgs, Model
 
-# --- Helper functions ---
-# Causal mask functions are not used by generate_frame with mask=None,
-# but are kept here for potential future re-enabling of masks.
-def _create_causal_mask(seq_len: int, device: torch.device) -> torch.Tensor:
-    return torch.tril(torch.ones(seq_len, seq_len, dtype=torch.bool, device=device))
 
-def _index_causal_mask(mask: Optional[torch.Tensor], input_pos: torch.Tensor) -> Optional[torch.Tensor]:
-    if mask is None: return None
-    max_seq_len = mask.size(-1)
-    bsz, seq_len = input_pos.shape
-    assert torch.all(input_pos < max_seq_len), f"Input position {input_pos.max()} exceeds mask dim {max_seq_len}"
-    if mask.device != input_pos.device:
-        input_pos = input_pos.to(mask.device)
-    input_pos_flat = input_pos.squeeze(0) # Assumes bsz=1
-    indexed_mask_rows = mask[input_pos_flat]
-    current_kv_seq_len = input_pos.max() + 1
-    final_mask = indexed_mask_rows[:, :current_kv_seq_len] # [S_q, S_kv]
-    return final_mask
-
-def _multinomial_sample_one_no_sync(probs: torch.Tensor) -> torch.Tensor:
-    q = torch.empty_like(probs).exponential_(1)
-    return torch.argmax(probs / q, dim=-1, keepdim=True).to(dtype=torch.int)
-
-def sample_topk(logits: torch.Tensor, topk: int, temperature: float) -> torch.Tensor:
-    logits = logits / max(temperature, 1e-5)
-    filter_value: float = -float("Inf")
-    k = min(topk, logits.size(-1))
-    topk_values, _ = torch.topk(logits, k=k)
-    kth_value = topk_values[..., -1, None]
-    indices_to_remove = logits < kth_value
-    scores_processed = logits.masked_fill(indices_to_remove, filter_value)
-    probs = torch.nn.functional.softmax(scores_processed, dim=-1)
-    sample_token = _multinomial_sample_one_no_sync(probs)
-    return sample_token
-
+logger = logging.getLogger(__name__)
 
 @dataclass
 class Segment:
     speaker: int
     text: str
-    audio: Optional[torch.Tensor] = None
+    sample_rate = 24_000
+    audio: torch.Tensor
 
-# --- load_llama3_tokenizer ---
+
 def load_llama3_tokenizer():
-    tokenizer_name = "meta-llama/Llama-3.2-1B"
-    print(f"Attempting to load tokenizer: {tokenizer_name}")
-    hf_token = os.environ.get("HUGGING_FACE_TOKEN")
-    print(f"Proceeding with AutoTokenizer.from_pretrained('{tokenizer_name}')...")
-    try:
-        tokenizer = AutoTokenizer.from_pretrained(tokenizer_name, token=hf_token if hf_token else None)
-    except Exception as e:
-        print(f"ERROR: Failed to load tokenizer '{tokenizer_name}': {e}")
-        raise
-    if not tokenizer.bos_token or not tokenizer.eos_token:
-         print("Warning: Tokenizer might be missing BOS or EOS tokens.")
-    print("Tokenizer loaded.")
+    """
+    https://github.com/huggingface/transformers/issues/22794#issuecomment-2092623992
+    """
+    tokenizer_name = "unsloth/Llama-3.2-1B"
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+    bos = tokenizer.bos_token
+    eos = tokenizer.eos_token
+    tokenizer._tokenizer.post_processor = TemplateProcessing(
+        single=f"{bos}:0 $A:0 {eos}:0",
+        pair=f"{bos}:0 $A:0 {eos}:0 {bos}:1 $B:1 {eos}:1",
+        special_tokens=[(f"{bos}", tokenizer.bos_token_id), (f"{eos}", tokenizer.eos_token_id)],
+    )
+
     return tokenizer
+
 
 class Generator:
     def __init__(self, model: Model):
         self._model = model
+        self._model.setup_caches(1)
+
         self._text_tokenizer = load_llama3_tokenizer()
-        self.device = next(model.parameters()).device
-        print(f"Generator initializing on device: {self.device}")
-        try:
-            print(f"Attempting to load audio tokenizer (Mimi/Encodec)...")
-            mimi = loaders.get_mimi(device=self.device)
-            print("Successfully loaded audio tokenizer (Mimi/Encodec).")
-            mimi.eval()
-            self._audio_tokenizer = mimi
-        except Exception as e:
-            print(f"ERROR: Failed during audio tokenizer loading: {e}")
-            raise RuntimeError(f"Failed to load audio tokenizer: {e}") from e
-        self.sample_rate = getattr(self._audio_tokenizer, 'sample_rate', 24000)
-        self.frame_rate = getattr(self._audio_tokenizer, 'frame_rate', 75.0)
-        self.num_codebooks = self._model.config.audio_num_codebooks
-        self.audio_vocab_size = self._model.config.audio_vocab_size
-        self.expected_token_cols = self.num_codebooks + 1
-        print(f"Generator initialized. Sample rate: {self.sample_rate} Hz, Frame rate: {self.frame_rate} Hz")
-        print(f"  Num Codebooks: {self.num_codebooks}, Audio Vocab Size: {self.audio_vocab_size}")
+        device = next(model.parameters()).device
 
-    # --- Embedding methods ---
-    def _embed_audio(self, codebook: int, tokens: torch.Tensor) -> torch.Tensor:
-        offset = codebook * self.audio_vocab_size
-        tokens_long = tokens.squeeze(-1).long() if tokens.ndim > 1 else tokens.long()
-        indices = tokens_long + offset
-        try:
-            embeddings = self._model.audio_embeddings(indices)
-        except IndexError as e:
-             print(f"\nERROR (_embed_audio): Index out of bounds.")
-             raise e
-        return embeddings
+        mimi_weight = hf_hub_download(loaders.DEFAULT_REPO, loaders.MIMI_NAME)
+        mimi = loaders.get_mimi(mimi_weight, device=device)
+        
+        num_codebooks = model.config.audio_num_codebooks
+        mimi.set_num_codebooks(num_codebooks)
+        self._num_codebooks = num_codebooks
+        self._audio_tokenizer = mimi
 
-    def _embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
-        batch_size, seq_len, num_modalities = tokens.shape
-        if num_modalities != self.expected_token_cols:
-             raise ValueError(f"Expected {self.expected_token_cols} modalities, got {num_modalities} in tokens shape {tokens.shape}")
-        text_tokens = tokens[:, :, -1]
-        audio_tokens = tokens[:, :, :self.num_codebooks]
-        text_embeds = self._model.text_embeddings(text_tokens.long())
-        audio_embeds_sum = torch.zeros_like(text_embeds)
-        for i in range(self.num_codebooks):
-             cb_tokens = audio_tokens[:, :, i]
-             cb_embeds = self._embed_audio(i, cb_tokens)
-             audio_embeds_sum += cb_embeds
-        total_embeddings = text_embeds + audio_embeds_sum
-        return total_embeddings
+        self.sample_rate = mimi.sample_rate
+        self.device = device
 
-    # --- Tokenization methods ---
+        self._stream_buffer_size = 20
+        self.max_seq_len = 2048
+        self._cache = OrderedDict()
+        self._text_token_cache = {}
+        torch.set_num_threads(16)
+        torch.cuda.set_per_process_memory_fraction(0.95)
+
     def _tokenize_text_segment(self, text: str, speaker: int) -> Tuple[torch.Tensor, torch.Tensor]:
-        text_tokens = self._text_tokenizer.encode(f"[{speaker}]{text}", add_special_tokens=False)
-        num_text_tokens = len(text_tokens)
-        text_frame = torch.zeros(num_text_tokens, self.expected_token_cols, dtype=torch.long, device=self.device)
-        text_frame_mask = torch.zeros(num_text_tokens, self.expected_token_cols, dtype=torch.bool, device=self.device)
+        """
+        Tokenize text segment with caching optimization for reduced latency.
+        """
+        # Check cache first
+        cache_key = f"{speaker}:{text}"
+        if not hasattr(self, '_text_token_cache'):
+            self._text_token_cache = {}
+        
+        if cache_key in self._text_token_cache:
+            return self._text_token_cache[cache_key]
+
+        text_tokens = self._text_tokenizer.encode(f"[{speaker}]{text}")
+        text_frame = torch.zeros(len(text_tokens), self._num_codebooks+1, dtype=torch.long, device=self.device)
+        text_frame_mask = torch.zeros(len(text_tokens), self._num_codebooks+1, dtype=torch.bool, device=self.device)
         text_frame[:, -1] = torch.tensor(text_tokens, device=self.device)
         text_frame_mask[:, -1] = True
-        return text_frame, text_frame_mask
+
+        frame_tokens = [text_frame]
+        frame_masks = [text_frame_mask]
+        
+        result = (torch.cat(frame_tokens, dim=0), torch.cat(frame_masks, dim=0))
+        
+        self._text_token_cache[cache_key] = result
+        
+        return result
+
 
     def _tokenize_audio(self, audio: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        if audio is None or audio.numel() == 0:
-            return torch.empty((0, self.expected_token_cols), dtype=torch.long, device=self.device), torch.empty((0, self.expected_token_cols), dtype=torch.bool, device=self.device)
-        if audio.ndim > 1: audio = torch.mean(audio, dim=0) if audio.shape[0] != 1 else audio.squeeze(0)
-        assert audio.ndim == 1, f"Audio must be single channel, got ndim={audio.ndim}"
-        audio_dev = audio.to(self.device)
-        audio_tensor = audio_dev.unsqueeze(0).unsqueeze(0)
-        try:
-            with torch.no_grad():
-                codes_tuple = self._audio_tokenizer.encode(audio_tensor)
-            audio_codes = codes_tuple[0][0]
-        except Exception as e: print(f"ERROR during audio encoding: {e}"); raise
-        audio_tokens_t = audio_codes.squeeze(0).transpose(0, 1)
-        num_frames, num_encoded_codebooks = audio_tokens_t.shape
-        if num_encoded_codebooks != self.num_codebooks:
-             print(f"WARNING: Audio tokenizer generated {num_encoded_codebooks} codebooks, model expects {self.num_codebooks}. Padding/truncating.")
-             if num_encoded_codebooks > self.num_codebooks: audio_tokens_t = audio_tokens_t[:, :self.num_codebooks]
-             else: padding = torch.zeros((num_frames, self.num_codebooks - num_encoded_codebooks), dtype=audio_tokens_t.dtype, device=self.device); audio_tokens_t = torch.cat([audio_tokens_t, padding], dim=1)
-        audio_frame = torch.zeros(num_frames, self.expected_token_cols, dtype=torch.long, device=self.device)
-        audio_frame_mask = torch.zeros(num_frames, self.expected_token_cols, dtype=torch.bool, device=self.device)
-        audio_frame[:, :self.num_codebooks] = audio_tokens_t
-        audio_frame_mask[:, :self.num_codebooks] = True
-        return audio_frame, audio_frame_mask
+
+        frame_tokens = []
+        frame_masks = []
+
+        # (K, T)
+        audio = audio.to(self.device)
+        audio_tokens = self._audio_tokenizer.encode(audio.unsqueeze(0).unsqueeze(0))[0]
+        
+        # Limit to the number of codebooks set in MIMI
+        audio_tokens = audio_tokens[:self._num_codebooks, :]
+        
+        # add EOS frame
+        eos_frame = torch.zeros(audio_tokens.size(0), 1).to(self.device)
+        audio_tokens = torch.cat([audio_tokens, eos_frame], dim=1)
+
+        audio_frame = torch.zeros(audio_tokens.size(1), self._num_codebooks+1).long().to(self.device)
+        audio_frame_mask = torch.zeros(audio_tokens.size(1), self._num_codebooks+1).bool().to(self.device)
+        audio_frame[:, :self._num_codebooks] = audio_tokens.transpose(0, 1)
+        audio_frame_mask[:, :self._num_codebooks] = True
+
+        frame_tokens.append(audio_frame)
+        frame_masks.append(audio_frame_mask)
+
+        return torch.cat(frame_tokens, dim=0), torch.cat(frame_masks, dim=0)
 
     def _tokenize_segment(self, segment: Segment) -> Tuple[torch.Tensor, torch.Tensor]:
         text_tokens, text_masks = self._tokenize_text_segment(segment.text, segment.speaker)
-        if segment.audio is not None and segment.audio.numel() > 0:
-            audio_tokens, audio_masks = self._tokenize_audio(segment.audio)
-            return torch.cat([text_tokens, audio_tokens], dim=0), torch.cat([text_masks, audio_masks], dim=0)
-        else: return text_tokens, text_masks
-    # --- End Tokenization methods ---
+        audio_tokens, audio_masks = self._tokenize_audio(segment.audio)
 
+        total_len = text_tokens.size(0) + audio_tokens.size(0)
 
-    # --- generate_frame METHOD (Passing mask=None to ALL layers) ---
+        if total_len > self.max_seq_len:
+            overflow = total_len - self.max_seq_len
+
+            if text_tokens.size(0) > overflow:
+                text_tokens = text_tokens[overflow:]
+                text_masks = text_masks[overflow:]
+            else:
+                audio_overflow = overflow - text_tokens.size(0)
+                text_tokens = text_tokens[0:0]
+                text_masks = text_masks[0:0]
+                audio_tokens = audio_tokens[audio_overflow:]
+                audio_masks = audio_masks[audio_overflow:]
+
+        return torch.cat([text_tokens, audio_tokens], dim=0), torch.cat([text_masks, audio_masks], dim=0)
+
+    
+    def _decode_frames(self, frames):
+        if not frames:
+            return torch.tensor([])
+        
+        # Only use first N codebooks for faster decoding
+        frames_reduced = [frame[:, :self._num_codebooks//2] for frame in frames]
+        audio = self._audio_tokenizer.decode(torch.stack(frames_reduced).permute(1, 2, 0)).squeeze(0).squeeze(0)
+        return audio
+
     @torch.inference_mode()
-    def generate_frame(
+    def generate_stream(
         self,
-        tokens: torch.Tensor,
-        tokens_mask: torch.Tensor,
-        input_pos: torch.Tensor,
-        temperature: float,
-        topk: int,
-    ) -> torch.Tensor:
-        device = tokens.device
-        dtype = next(self._model.parameters()).dtype
-        b, s_hist = input_pos.shape
-        assert b == 1, "generate_frame currently assumes batch size 1"
-        input_pos = input_pos.to(device)
-        input_embeddings = self._embed_tokens(tokens)
+        text: str,
+        speaker: int,
+        context: List[Segment],
+        max_audio_length_ms: float = 90_000,
+        temperature: float = 0.7,
+        topk: int = 30,
+        on_chunk_generated: Optional[Callable[[torch.Tensor], None]] = None,
+    ):
+        """
+        Generate audio in a streaming fashion, optimized for lower latency to first chunk.
+        """
+        if torch.cuda.is_available():
+            torch.backends.cuda.matmul.allow_tf32 = True
+            torch.backends.cudnn.benchmark = True
+            torch.cuda.empty_cache()
+            torch.cuda.synchronize()
 
-        backbone_input_h = input_embeddings[:, -1:, :]
-        backbone_input_pos = input_pos[:, -1:]
-        h_backbone = backbone_input_h
-        if not hasattr(self._model.backbone, 'layers') or not isinstance(self._model.backbone.layers, nn.ModuleList):
-            raise AttributeError("Backbone model structure missing 'layers' attribute.")
+        self._model.reset_caches()
 
-        for layer_idx, layer in enumerate(self._model.backbone.layers):
-            final_mask_for_layer = None # Pass mask=None
-            try:
-                h_backbone = layer(h_backbone, input_pos=backbone_input_pos, mask=final_mask_for_layer)
-            except Exception as e:
-                 print(f"\n--- ERROR in Backbone Layer {layer_idx} ---")
-                 print(f"Mask passed to backbone layer {layer_idx}: None")
-                 # ... (keep detailed error logging) ...
-                 raise RuntimeError(f"Error in backbone layer {layer_idx}") from e
+        max_generation_len = int(max_audio_length_ms / 80)
 
-        if hasattr(self._model.backbone, 'norm') and isinstance(self._model.backbone.norm, nn.Module):
-            h_backbone = self._model.backbone.norm(h_backbone)
-        h_backbone = h_backbone.to(dtype=dtype)
-        last_backbone_h = h_backbone.squeeze(1)
+        tokens, tokens_mask = [], []
 
-        # --- Decoder Logic ---
-        c0_logits = self._model.codebook0_head(last_backbone_h)
-        c0_sample = sample_topk(c0_logits, topk, temperature)
-        c0_embed_backbone = self._embed_audio(0, c0_sample)
-        projected_h = self._model.projection(last_backbone_h)
-        projected_c0_embed = self._model.projection(c0_embed_backbone)
-        generated_samples = [c0_sample.clone()]
+        initial_batch_size = 20
+        normal_batch_size = 20  
+        initial_buffer_size = 20
+        normal_buffer_size = 20
+        
+        batch_size = initial_batch_size
+        buffer_size = initial_buffer_size
+        first_chunk_delivered = False
 
-        if hasattr(self._model.decoder, 'reset_caches'): self._model.decoder.reset_caches()
+        context_start = time.time()
+        if context:
+            for segment in context:
+                segment_tokens, segment_tokens_mask = self._tokenize_segment(segment)
+                tokens.append(segment_tokens)
+                tokens_mask.append(segment_tokens_mask)
 
-        decoder_inputs_proj = [projected_h, projected_c0_embed]
-        h_decoder = None
-        for step in range(2):
-            decoder_step_input = decoder_inputs_proj[step].unsqueeze(1)
-            decoder_step_pos = torch.full((b, 1), step, dtype=torch.long, device=device)
-            h_decoder_step = decoder_step_input
-            if not hasattr(self._model.decoder, 'layers') or not isinstance(self._model.decoder.layers, nn.ModuleList):
-                 raise AttributeError("Decoder model structure missing 'layers' attribute.")
-            for layer_idx, layer in enumerate(self._model.decoder.layers):
-                 final_mask_for_layer = None # Pass mask=None
-                 try:
-                      h_decoder_step = layer(h_decoder_step, input_pos=decoder_step_pos, mask=final_mask_for_layer)
-                 except Exception as e:
-                      print(f"\n--- ERROR in Decoder Layer {layer_idx} (Priming Step {step}) ---")
-                      print(f"Mask passed to layer: None")
-                      # ... (keep detailed error logging) ...
-                      raise RuntimeError(f"Error in decoder layer {layer_idx} during priming step {step}") from e
-            h_decoder = h_decoder_step
+        gen_segment_tokens, gen_segment_tokens_mask = self._tokenize_text_segment(text, speaker)
+        tokens.append(gen_segment_tokens)
+        tokens_mask.append(gen_segment_tokens_mask)
 
-        if hasattr(self._model.decoder, 'norm') and isinstance(self._model.decoder.norm, nn.Module):
-             h_decoder = self._model.decoder.norm(h_decoder)
-        h_decoder = h_decoder.to(dtype=dtype)
-        last_decoder_h = h_decoder.squeeze(1)
+        prompt_tokens = torch.cat(tokens, dim=0).long().to(self.device)
+        prompt_tokens_mask = torch.cat(tokens_mask, dim=0).bool().to(self.device)
 
-        for i in range(1, self.num_codebooks):
-            head_index = i - 1
-            ci_logits = torch.mm(last_decoder_h, self._model.audio_head[head_index])
-            ci_sample = sample_topk(ci_logits, topk, temperature)
-            generated_samples.append(ci_sample)
-            ci_embed_backbone = self._embed_audio(i, ci_sample)
-            ci_embed_decoder = self._model.projection(ci_embed_backbone).unsqueeze(1)
-            decoder_step_pos = torch.full((b, 1), i + 1, dtype=torch.long, device=device)
-            h_decoder_step = ci_embed_decoder
-            for layer_idx, layer in enumerate(self._model.decoder.layers):
-                 final_mask_for_layer = None # Pass mask=None
-                 try:
-                      h_decoder_step = layer(h_decoder_step, input_pos=decoder_step_pos, mask=final_mask_for_layer)
-                 except Exception as e:
-                      print(f"\n--- ERROR in Decoder Layer {layer_idx} (Generating C{i}) ---")
-                      print(f"Mask passed to layer: None")
-                      # ... (keep detailed error logging) ...
-                      raise RuntimeError(f"Error in decoder layer {layer_idx} generating C{i}") from e
-            if hasattr(self._model.decoder, 'norm') and isinstance(self._model.decoder.norm, nn.Module):
-                h_decoder_step = self._model.decoder.norm(h_decoder_step)
-            last_decoder_h = h_decoder_step.to(dtype=dtype).squeeze(1)
+        max_seq_len = 2048
+        if prompt_tokens.size(0) > max_seq_len:
+            prompt_tokens = prompt_tokens[-max_seq_len:]
+            prompt_tokens_mask = prompt_tokens_mask[-max_seq_len:]
 
-        final_samples = torch.cat(generated_samples, dim=1)
-        return final_samples
-    # --- END generate_frame ---
+        curr_tokens = prompt_tokens.unsqueeze(0)
+        curr_tokens_mask = prompt_tokens_mask.unsqueeze(0)
+        curr_pos = torch.arange(0, prompt_tokens.size(0)).unsqueeze(0).long().to(self.device)
 
-    # --- generate METHOD (Applying final Encodec decode fix) ---
+        expected_frame_count = buffer_size 
+        frame_buffer = []
+
+        zeros_1_1 = torch.zeros(1, 1).long().to(self.device)
+        zeros_mask_1_1 = torch.zeros(1, 1).bool().to(self.device)
+
+        def update_tokens(sample):
+            nonlocal curr_tokens, curr_tokens_mask, curr_pos
+            ones = torch.ones_like(sample).bool()
+            curr_tokens = torch.cat([sample, zeros_1_1], dim=1).unsqueeze(1)
+            curr_tokens_mask = torch.cat([ones, zeros_mask_1_1], dim=1).unsqueeze(1)
+            curr_pos = curr_pos[:, -1:] + 1
+
+        with self._audio_tokenizer.streaming(1):
+            i = 0
+            generation_start = time.time()
+
+            while i < max_generation_len:
+                batch_end = min(i + batch_size, max_generation_len)
+                batch_size_actual = batch_end - i
+
+                batch_samples = []
+
+                for _ in range(batch_size_actual):
+                    with torch.autocast(device_type=self.device.type, dtype=torch.bfloat16):
+                        sample = self._model.generate_frame(curr_tokens, curr_tokens_mask, curr_pos, temperature, topk)
+                        if torch.cuda.is_available() and hasattr(torch, "cuda") and hasattr(torch.cuda, "is_available"):
+                            try:
+                                torch.cuda.synchronize()  # Force sync before checking
+                                if sample.numel() == 0 or torch.isnan(sample).any():
+                                    print("Warning: Generated empty or NaN sample, stopping generation")
+                                    break
+                            except:
+                                print("Error checking tensor, stopping generation")
+                                break
+                    if torch.all(sample == 0):
+                        break
+
+                    batch_samples.append(sample)
+                    update_tokens(sample)
+
+                if not batch_samples:
+                    break
+
+                frame_buffer.extend(batch_samples)
+                i += len(batch_samples)
+
+                if len(frame_buffer) >= buffer_size:
+                    frames_to_process = frame_buffer[:expected_frame_count]
+                    
+                    # If we don't have enough frames, pad with zeros to match expected shape
+                    if len(frames_to_process) < expected_frame_count:
+                        # Create padding frames (zeros)
+                        padding_frames = [
+                            torch.zeros_like(frames_to_process[0]) 
+                            for _ in range(expected_frame_count - len(frames_to_process))
+                        ]
+                        
+                        # Combine actual frames with padding
+                        frames_to_process = frames_to_process + padding_frames
+                    
+                    frames_stacked = torch.stack(frames_to_process).permute(1, 2, 0)
+                    audio_chunk = self._audio_tokenizer.decode(frames_stacked).squeeze(0).squeeze(0)
+                    
+                    # Keep remaining frames for next iteration
+                    frame_buffer = frame_buffer[expected_frame_count:]
+                    
+                    # Process and yield the chunk
+                    cpu_chunk = audio_chunk.cpu()
+                    if on_chunk_generated:
+                        on_chunk_generated(cpu_chunk)
+                    
+                    # After first chunk is delivered, switch to normal batch and buffer sizes
+                    if not first_chunk_delivered:
+                        batch_size = normal_batch_size
+                        buffer_size = normal_buffer_size
+                        expected_frame_count = buffer_size
+                        first_chunk_delivered = True
+                    
+                    yield cpu_chunk
+
+                    # Occasionally print progress and sync GPU
+                    if i >= 100 and (i % 100 == 0):
+                        if torch.cuda.is_available():
+                            torch.cuda.synchronize()
+                        print(f"Generated {i} frames ({i * 0.08:.2f}s of audio)")
+
+            # Process any remaining frames
+            if frame_buffer:
+                # Pad frame buffer if necessary
+                if len(frame_buffer) < expected_frame_count:
+                    padding_frames = [
+                        torch.zeros_like(frame_buffer[0]) 
+                        for _ in range(expected_frame_count - len(frame_buffer))
+                    ]
+                    frames_to_process = frame_buffer + padding_frames
+                else:
+                    # Otherwise take as many frames as possible that are a multiple of expected_frame_count
+                    frames_multiple = (len(frame_buffer) // expected_frame_count) * expected_frame_count
+                    frames_to_process = frame_buffer[:frames_multiple]
+                    
+                frames_stacked = torch.stack(frames_to_process).permute(1, 2, 0)
+                audio_chunk = self._audio_tokenizer.decode(frames_stacked).squeeze(0).squeeze(0)
+                
+                # Determine actual audio length (before padding)
+                actual_frames_percentage = min(len(frame_buffer), expected_frame_count) / expected_frame_count
+                actual_samples = int(audio_chunk.shape[0] * actual_frames_percentage)
+                
+                # Return only the non-padded portion of audio if we added padding
+                if len(frame_buffer) < expected_frame_count:
+                    audio_chunk = audio_chunk[:actual_samples]
+                    
+                cpu_chunk = audio_chunk.cpu()
+                if on_chunk_generated:
+                    on_chunk_generated(cpu_chunk)
+                yield cpu_chunk
+
+            # Print final performance metrics
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
+            total_time = time.time() - generation_start
+            frames_generated = i
+            audio_seconds = frames_generated * 0.08
+            rtf = total_time / audio_seconds if audio_seconds > 0 else float('inf')
+            print(f"Total time: {total_time:.2f}s")
+            print(f"Generated {frames_generated} frames ({audio_seconds:.2f}s of audio)")
+            print(f"Real-time factor: {rtf:.3f}x (target: <1.0)")
+
     @torch.inference_mode()
     def generate(
-        self, text: str, speaker: int, context: List[Segment],
-        max_audio_length_ms: float = 90_000, # Default max length
-        temperature: float = 0.9, topk: int = 50,
-    ) -> torch.Tensor:
-        if hasattr(self._model.backbone, 'reset_caches'): self._model.backbone.reset_caches()
-        if hasattr(self._model.decoder, 'reset_caches'): self._model.decoder.reset_caches()
-        print("KV Caches reset via Generator.generate().")
+        self,
+        text: str,
+        speaker: int,
+        context: List[Segment],
+        max_audio_length_ms: float = 90_000,
+        temperature: float = 0.8,
+        topk: int = 40,
+        stream: bool = False,
+        output_file: Optional[str] = None,
+    ):
+        """
+        Generate audio with optional streaming and file output.
+        
+        Args:
+            text: Text to generate audio for
+            speaker: Speaker ID
+            context: List of context segments
+            max_audio_length_ms: Maximum audio length in milliseconds
+            temperature: Sampling temperature
+            topk: Top-k sampling parameter
+            stream: Whether to use streaming generation
+            output_file: If provided and stream=True, output will be saved to this file
+        
+        Returns:
+            torch.Tensor: Generated audio tensor
+        """
+        if stream:
+            if output_file:
+                # Setup streaming to file
+                write_chunk, close_wav = stream_audio_to_wav(output_file, self.sample_rate)
+                
+                # Collect chunks while streaming to file
+                audio_chunks = []
+                t1 = time.time()
+                
+                for i, chunk in enumerate(self.generate_stream(
+                    text, speaker, context, max_audio_length_ms, temperature, topk
+                )):
+                    # Write to file
+                    write_chunk(chunk)
+                    # Store for return value
+                    audio_chunks.append(chunk)
+                    
+                    # Occasionally print progress
+                    if i % 5 == 0:
+                        print(f"Part {i+1} available after {time.time() - t1:.4f}s")
+                        t1 = time.time()
+                
+                # Close file
+                close_wav()
+                print(f"Streaming complete, WAV file saved to {output_file}")
+            else:
+                # Just collect chunks without file output
+                audio_chunks = []
+                for chunk in self.generate_stream(text, speaker, context, max_audio_length_ms, temperature, topk):
+                    audio_chunks.append(chunk)
+            
+            if not audio_chunks:
+                return torch.tensor([])
+            return torch.cat(audio_chunks)
 
-        actual_max_generation_len = int(max_audio_length_ms / 1000 * self.frame_rate)
-        print(f"Target max generation frames: {actual_max_generation_len}")
+        # Non-streaming generation remains unchanged
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
-        # 1. Tokenize Context + Current Text
-        prompt_frames = []
-        prompt_masks = []
-        total_prompt_len = 0
+        self._model.reset_caches()
+
+        max_generation_len = int(max_audio_length_ms / 80)
+        tokens, tokens_mask = [], []
+
         for segment in context:
-            s_tokens, s_masks = self._tokenize_segment(segment)
-            prompt_frames.append(s_tokens)
-            prompt_masks.append(s_masks)
-            total_prompt_len += s_tokens.size(0)
-        gen_text_tokens, gen_text_masks = self._tokenize_text_segment(text, speaker)
-        prompt_frames.append(gen_text_tokens)
-        prompt_masks.append(gen_text_masks)
-        total_prompt_len += gen_text_tokens.size(0)
-        full_prompt_tokens = torch.cat(prompt_frames, dim=0).unsqueeze(0)
-        full_prompt_masks = torch.cat(prompt_masks, dim=0).unsqueeze(0)
-        print(f"Total prompt length: {total_prompt_len} frames.")
-        max_seq_len = getattr(self._model.backbone, 'max_seq_len', 2048)
-        if total_prompt_len >= max_seq_len:
-             raise ValueError(f"Prompt too long ({total_prompt_len} frames). Max allowable is {max_seq_len - 1}.")
+            segment_tokens, segment_tokens_mask = self._tokenize_segment(segment)
+            tokens.append(segment_tokens)
+            tokens_mask.append(segment_tokens_mask)
 
-        # Calculate effective max based on remaining space AND requested max length
-        effective_max_gen_len = min(actual_max_generation_len, max_seq_len - total_prompt_len - 1)
+        gen_segment_tokens, gen_segment_tokens_mask = self._tokenize_text_segment(text, speaker)
+        tokens.append(gen_segment_tokens)
+        tokens_mask.append(gen_segment_tokens_mask)
 
-        if effective_max_gen_len <= 0:
-            print(f"Warning: Prompt length ({total_prompt_len}) or requested max_audio_length leaves no room for generation. Returning empty.")
-            return torch.empty(0, device='cpu')
-        print(f"Effective max generation frames: {effective_max_gen_len}")
+        prompt_tokens = torch.cat(tokens, dim=0).long().to(self.device)
+        prompt_tokens_mask = torch.cat(tokens_mask, dim=0).bool().to(self.device)
 
-        # 2. Process prompt token-by-token
-        print(f"Processing prompt ({total_prompt_len} frames) token-by-token...")
-        curr_tokens_hist = []
-        curr_masks_hist = []
-        for i in range(total_prompt_len):
-            print(f"  Processing prompt frame {i+1}/{total_prompt_len}", end='\r')
-            single_token_frame = full_prompt_tokens[:, i:i+1, :]
-            single_mask_frame = full_prompt_masks[:, i:i+1, :]
-            curr_tokens_hist.append(single_token_frame)
-            curr_masks_hist.append(single_mask_frame)
-            context_tokens = torch.cat(curr_tokens_hist, dim=1)
-            context_masks = torch.cat(curr_masks_hist, dim=1)
-            context_pos = torch.arange(0, i + 1, device=self.device).unsqueeze(0)
-            _ = self.generate_frame(
-                tokens=context_tokens, tokens_mask=context_masks, input_pos=context_pos,
-                temperature=temperature, topk=topk
-            )
-        print(f"\nPrompt processing complete.")
+        max_seq_len = 2048
+        if prompt_tokens.size(0) > max_seq_len:
+            prompt_tokens = prompt_tokens[-max_seq_len:]
+            prompt_tokens_mask = prompt_tokens_mask[-max_seq_len:]
 
-        # 3. Autoregressive Generation Loop
-        curr_tokens = context_tokens
-        curr_masks = context_masks
-        curr_pos = context_pos
-        generated_audio_codebooks = []
-        print(f"Starting generation loop for max {effective_max_gen_len} audio frames...")
-        for i in range(effective_max_gen_len):
-            print(f"  Gen Step {i+1}/{effective_max_gen_len}, Hist Len: {curr_tokens.size(1)}", end='\r')
-            next_audio_frame_codes = self.generate_frame(
-                tokens=curr_tokens, tokens_mask=curr_masks, input_pos=curr_pos,
-                temperature=temperature, topk=topk
-            ).squeeze(0)
-            generated_audio_codebooks.append(next_audio_frame_codes)
-            next_input_frame = torch.zeros(1, 1, self.expected_token_cols, dtype=torch.long, device=self.device)
-            next_input_mask = torch.zeros(1, 1, self.expected_token_cols, dtype=torch.bool, device=self.device)
-            next_input_frame[0, 0, :self.num_codebooks] = next_audio_frame_codes
-            next_input_mask[0, 0, :self.num_codebooks] = True
-            curr_tokens = torch.cat([curr_tokens, next_input_frame], dim=1)
-            curr_masks = torch.cat([curr_masks, next_input_mask], dim=1)
-            next_pos_val = curr_tokens.size(1) - 1
-            next_pos = torch.tensor([[next_pos_val]], device=self.device)
-            curr_pos = torch.cat([curr_pos, next_pos], dim=1)
-            if curr_tokens.size(1) >= max_seq_len:
-                print(f"\nWarning: Reached max sequence length ({max_seq_len}). Stopping generation.")
-                break
-        else:
-             print(f"\nFinished generation loop after {effective_max_gen_len} steps.")
+        curr_tokens = prompt_tokens.unsqueeze(0)
+        curr_tokens_mask = prompt_tokens_mask.unsqueeze(0)
+        curr_pos = torch.arange(0, prompt_tokens.size(0)).unsqueeze(0).long().to(self.device)
 
-        # 4. Decode generated audio codebooks
-        if not generated_audio_codebooks:
-            print("Warning: No audio frames generated.")
-            return torch.empty(0, device='cpu')
+        samples = []
+        with self._audio_tokenizer.streaming(1):
+            for _ in range(max_generation_len):
+                sample = self._model.generate_frame(curr_tokens, curr_tokens_mask, curr_pos, temperature, topk)
+                if torch.all(sample == 0):
+                    break
+                samples.append(sample)
 
-        # --- CORRECTED DECODING INPUT FORMAT (ChatGPT Suggestion + dtype=long) ---
-        stacked = torch.stack(generated_audio_codebooks, dim=0)   # [T_gen, N_codebooks]
-        # Permute, add batch dim, ensure LONG dtype for embeddings
-        codes = stacked.permute(1, 0).unsqueeze(0).long()        # [1, N_codebooks, T_gen]
+                curr_tokens = torch.cat([sample, torch.zeros(1, 1).long().to(self.device)], dim=1).unsqueeze(1)
+                curr_tokens_mask = torch.cat(
+                    [torch.ones_like(sample).bool(), torch.zeros(1, 1).bool().to(self.device)], dim=1
+                ).unsqueeze(1)
+                curr_pos = curr_pos[:, -1:] + 1
 
-        # Create scale tensor with matching batch dimension [1, N_codebooks]
-        scale = torch.ones((1, codes.size(1)), device=codes.device, dtype=torch.float32)
+        if not samples:
+            return torch.tensor([])
 
-        # Encodec expects a list containing one tuple: (codes[B, N, T], scale[B, N])
-        encoded_frames = [(codes, scale)]
-        print(f"\nDecoding {codes.shape[2]} frames using input format: List[Tuple(codes:{codes.shape}, scale:{scale.shape})]")
-        # --- END CORRECTION ---
+        return self._audio_tokenizer.decode(torch.stack(samples).permute(1, 2, 0)).squeeze(0).squeeze(0)
 
+class AudioStreamWriter:
+    """
+    Helper class for writing streaming audio to a file.
+    """
+    def __init__(self, filename, sample_rate):
+        self.filename = filename
+        self.sample_rate = sample_rate
+        self.audio_chunks = []
+        self.lock = threading.Lock()
+        self.queue = queue.Queue()
+        self.running = True
+        
+        # Start background writer thread
+        self.writer_thread = threading.Thread(target=self._writer_worker, daemon=True)
+        self.writer_thread.start()
+        
+    def _writer_worker(self):
+        """Background thread that handles audio chunk processing"""
+        buffer_chunks = []
+        last_flush_time = time.time()
+        
+        while self.running or not self.queue.empty():
+            try:
+                # Get chunk with timeout to allow for regular checks
+                chunk = self.queue.get(timeout=0.2)
+                buffer_chunks.append(chunk)
+                
+                # Periodically flush the buffer to the main list
+                current_time = time.time()
+                if len(buffer_chunks) >= 10 or (current_time - last_flush_time > 2.0 and buffer_chunks):
+                    with self.lock:
+                        self.audio_chunks.extend(buffer_chunks)
+                    buffer_chunks = []
+                    last_flush_time = current_time
+                    
+            except queue.Empty:
+                # If queue is empty but we have pending chunks, add them
+                if buffer_chunks:
+                    with self.lock:
+                        self.audio_chunks.extend(buffer_chunks)
+                    buffer_chunks = []
+                    last_flush_time = time.time()
+        
+        # Final flush of any remaining chunks
+        if buffer_chunks:
+            with self.lock:
+                self.audio_chunks.extend(buffer_chunks)
+        
+    def add_chunk(self, chunk):
+        """Add an audio chunk to the buffer queue without blocking"""
         try:
-            with torch.no_grad():
-                audio = self._audio_tokenizer.decode(encoded_frames) # Expect [B=1, C=1, T_samples] or [B=1, T_samples]
-        except Exception as e:
-            print(f"ERROR during audio decoding: {type(e).__name__}: {e}")
-            print(f"Input codes shape (passed): {codes.shape}, dtype: {codes.dtype}") # Log dtype
-            print(f"Input scale shape (passed): {scale.shape}, dtype: {scale.dtype}")
-            # --- Add CUDA sync for safety before re-raising ---
-            if self.device.type == 'cuda':
-                try:
-                    torch.cuda.synchronize() # Wait for any async errors
-                    # torch.cuda.empty_cache() # Optional cleanup
-                except Exception as sync_err:
-                    print(f"  WARNING: Error during CUDA sync/clear after decode error: {sync_err}")
-            # --- End CUDA sync ---
-            raise
+            self.queue.put(chunk, timeout=0.1)
+        except queue.Full:
+            # If queue is full, add directly to avoid losing data
+            with self.lock:
+                self.audio_chunks.append(chunk)
+    
+    def write_file(self):
+        """Write all collected audio chunks to file and clean up"""
+        # Signal the background thread to stop
+        self.running = False
+        # Wait for the thread to finish with a timeout
+        self.writer_thread.join(timeout=3.0)
+        
+        with self.lock:
+            if not self.audio_chunks:
+                return
+                
+            # Concatenate all chunks
+            audio = torch.cat(self.audio_chunks)
+            # Save to file
+            torchaudio.save(self.filename, audio.unsqueeze(0).cpu(), self.sample_rate)
 
-        # Squeeze batch and potentially channel dim, ensure float
-        if audio.ndim == 3: # [B, C, T]
-             audio = audio.squeeze(1) # -> [B, T]
-        audio = audio.squeeze(0).float() # Remove batch -> [T]
-        # Move to CPU *after* potential CUDA errors are handled
-        audio_cpu = audio.cpu()
-        print(f"Generated audio tensor shape: {audio_cpu.shape} ({audio_cpu.shape[0] / self.sample_rate:.2f} seconds)")
-        return audio_cpu
+import os
+import torch
+from models import Model, ModelArgs
+from generator import Generator
 
+def load_csm_1b_local(model_path: str, device: str = "cuda", audio_num_codebooks: int = 32):
+    """
+    Load the CSM-1B model from a local checkpoint with extreme optimizations and warmup.
+    """
+    import torch
+    import platform
+    from functools import lru_cache
+    from generator import Generator, Model, ModelArgs
 
-# --- load_csm_1b Function (NO CHANGES NEEDED) ---
-def load_csm_1b(model_id: str, device: str = "cuda") -> Generator:
-    # ... (remains the same) ...
-    model_config = ModelArgs(
-        backbone_flavor="llama-1B", decoder_flavor="llama-100M",
-        text_vocab_size=128_256, audio_vocab_size=2051, audio_num_codebooks=32
+    # Enable all CUDA optimizations
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cuda.enable_flash_sdp(True)
+    torch.backends.cudnn.benchmark = True
+    torch.backends.cudnn.enabled = True
+
+    print(f"Loading CSM-1B model from local checkpoint '{model_path}' with extreme optimizations...")
+
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+
+    config = ModelArgs(
+        backbone_flavor="llama-1B",
+        decoder_flavor="llama-100M",
+        text_vocab_size=128256,
+        audio_vocab_size=2051,
+        audio_num_codebooks=audio_num_codebooks,
     )
-    print(f"Using CORRECTED ModelArgs: {model_config}")
-    print("Instantiating CSM Model structure...")
+
+    model = Model.from_pretrained(model_path)
+    model.eval()
+
+    dtype = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float16
+
+    model.decoder = torch.compile(model.decoder, fullgraph=True, backend='cudagraphs')
+    model.forward = torch.compile(model.forward, mode="max-autotune")
+
+    model.to(device=device, dtype=dtype)
+
+    print("Model compilation complete. Creating generator...")
+
+    generator = Generator(model)
+    generator._stream_buffer_size = 20
+
+    # Setup tokenization caching
+    generator._tokenization_cache = {}
+
+    original_tokenize_text = generator._tokenize_text_segment
+
+    @lru_cache(maxsize=2048)
+    def cached_tokenize_text_segment(text_str, speaker_int):
+        return original_tokenize_text(text_str, speaker_int)
+
+    generator._tokenize_text_segment = lambda text, speaker: cached_tokenize_text_segment(text, speaker)
+
+    # Perform warmup
+    warmup_generator(generator)
+
+    return generator
+
+
+def warmup_generator(gen: Generator, warmup_text: str = "Hello, this is just a quick test warmup itll speed it up.", speaker_id: int = 0):
+        print("Performing generator warmup...")
+        warmup_audio = next(gen.generate_stream(
+            text=warmup_text,
+            speaker=speaker_id,
+            context=[],
+            max_audio_length_ms=10000,
+            temperature=0.8,
+            topk=50
+        ))
+        del warmup_audio
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        print("Warmup complete.")
+def load_csm_1b(model_id: str, device: str = "cuda") -> Generator:
+    """
+    Load the CSM model by repo ID using manual download and state dict loading.
+    Handles non-standard filenames like ckpt.safetensors.
+    Includes extreme optimizations for real-time performance.
+    """
+    target_device = device # Rename for clarity within the function
+    logger.info(f"Loading CSM model '{model_id}' using manual download/load. Target device: {target_device}")
+
+    # --- Setup & Optimizations ---
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cuda.enable_flash_sdp(True)
+    torch.backends.cudnn.benchmark = True
+    torch.backends.cudnn.enabled = True
+
+    if torch.cuda.is_available():
+        logger.info("Clearing CUDA cache before loading.")
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+
+    # Determine dtype based on device capability
+    dtype = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float16
+    logger.info(f"Target dtype determined as: {dtype}")
+
+    # --- Step 1: Define the model config ---
+    # (Assuming 32 codebooks for the finetune, same as base)
+    model_config = ModelArgs(
+        backbone_flavor="llama-1B",
+        decoder_flavor="llama-100M",
+        text_vocab_size=128256,
+        audio_vocab_size=2051,
+        audio_num_codebooks=32, # Standard CSM value, check if finetune used something else
+    )
+    logger.info(f"Using ModelArgs: {model_config}")
+
+    # --- Step 2: Instantiate the model structure ---
     model = Model(config=model_config)
-    print("Model structure instantiated.")
-    target_filename = "ckpt.safetensors"
-    print(f"Loading weights '{target_filename}' from '{model_id}'...")
-    cache_dir = os.getenv("HF_HOME")
+    logger.info("Model structure instantiated.")
+
+    # --- Step 3: Download the checkpoint file ---
+    weights_filename = "ckpt.safetensors" # The correct file for this repo
+    hf_token = os.getenv("HUGGING_FACE_TOKEN") # Get token from env
+    hf_cache = os.getenv("HF_HOME") # Get cache dir from env (optional but good)
+    logger.info(f"Attempting download: repo='{model_id}', filename='{weights_filename}', cache='{hf_cache}'")
     try:
         weights_path = hf_hub_download(
-            repo_id=model_id, filename=target_filename, cache_dir=cache_dir,
-            token=os.getenv("HUGGING_FACE_TOKEN")
+            repo_id=model_id,
+            filename=weights_filename,
+            cache_dir=hf_cache, # Pass cache dir if defined
+            token=hf_token # Pass token if defined
         )
-    except Exception as e: print(f"ERROR downloading weights: {e}"); raise
+        logger.info(f"Weights downloaded to: {weights_path}")
+    except Exception as download_err:
+        logger.critical(f"FAILED to download '{weights_filename}' from '{model_id}': {download_err}", exc_info=True)
+        raise RuntimeError(f"Failed to download weights: {download_err}") from download_err
+
+    # --- Step 4: Load the state dict from the safetensors file ---
+    logger.info(f"Loading state dictionary from '{weights_path}' using safe_open (to CPU).")
     state_dict = {}
     try:
         with safe_open(weights_path, framework="pt", device="cpu") as f:
-            for key in f.keys(): state_dict[key] = f.get_tensor(key)
-        print(f"State dict loaded from {weights_path} to CPU.")
-    except Exception as e: print(f"ERROR loading state dict: {e}"); raise
-    print("Loading state dict into model (strict=True)...")
+            for key in f.keys():
+                state_dict[key] = f.get_tensor(key)
+        logger.info(f"Successfully loaded {len(state_dict)} tensors from safetensors file.")
+    except Exception as sf_load_err:
+        logger.critical(f"FAILED to load tensors using safe_open from '{weights_path}': {sf_load_err}", exc_info=True)
+        raise RuntimeError(f"Failed to load safetensors: {sf_load_err}") from sf_load_err
+
+    # --- Step 5: Populate your model’s weights ---
+    logger.info("Loading state dict into model structure (strict=True).")
     try:
-        model.load_state_dict(state_dict, strict=True)
-        print("  State dict loaded successfully (strict=True).")
-    except Exception as e:
-        print(f"ERROR loading state dict (strict=True): {e}")
-        raise RuntimeError(f"Failed loading state dict strictly: {e}") from e
-    target_device = torch.device(device)
-    dtype = torch.float32
-    if target_device.type == 'cuda':
-        if torch.cuda.is_available():
-            dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
-            print(f"Using dtype {dtype} on CUDA device {target_device}.")
-        else:
-            print("WARNING: CUDA specified but not available! Using CPU.")
-            target_device = torch.device('cpu')
-    else:
-        print(f"Using dtype {dtype} on CPU device {target_device}.")
+        load_result = model.load_state_dict(state_dict, strict=True)
+        logger.info(f"Strict load successful. Result: {load_result}")
+    except Exception as strict_load_err:
+        logger.warning(f"Strict state dict loading failed: {strict_load_err}. Trying strict=False.")
+        try:
+            load_result = model.load_state_dict(state_dict, strict=False)
+            logger.info(f"Non-strict load successful. Result: {load_result}")
+        except Exception as non_strict_load_err:
+            logger.critical(f"FAILED to load state dict even with strict=False: {non_strict_load_err}", exc_info=True)
+            raise RuntimeError(f"Failed loading weights (strict=False): {non_strict_load_err}") from non_strict_load_err
+
+    # --- Step 6: Move to the target device & dtype, set to eval ---
+    logger.info(f"Moving model to target device '{target_device}' and dtype '{dtype}'.")
     model.to(device=target_device, dtype=dtype)
     model.eval()
-    print("Model moved to device and set to eval mode.")
-    try:
-        print("Setting up model KV caches...")
-        model.setup_caches(batch_size=1, dtype=dtype)
-        print("KV caches set up successfully.")
-    except Exception as e:
-        print(f"ERROR setting up caches: {e}")
-        raise RuntimeError(f"Failed setting up caches: {e}") from e
-    print("Initializing Generator...")
-    try:
-        generator = Generator(model)
-        print("Generator initialization complete.")
-        return generator
-    except Exception as e: print(f"ERROR initializing Generator: {e}"); raise
+    logger.info("Model moved to device and set to eval mode.")
 
-# --- END generator.py ---
+    # --- Compile relevant parts (after moving to device/dtype) ---
+    logger.info("Compiling model components with torch.compile...")
+    try:
+        # Only compile if not explicitly disabled (useful for debugging compile issues)
+        if os.getenv("NO_TORCH_COMPILE", "0") == "0":
+             model.decoder = torch.compile(model.decoder, fullgraph=True, backend='cudagraphs')
+             model.forward = torch.compile(model.forward, mode="max-autotune")
+             logger.info("Model compilation complete.")
+        else:
+             logger.warning("Skipping torch.compile based on NO_TORCH_COMPILE env var.")
+    except Exception as compile_err:
+        logger.error(f"Torch compile failed: {compile_err}. Performance may be impacted.", exc_info=True)
+        # Decide if this should be fatal or just a warning
+        # raise RuntimeError(f"Torch compile failed: {compile_err}") from compile_err
+
+    # --- Step 8: Wrap in your Generator ---
+    # (Step 7, setup_caches, is handled inside Generator.__init__)
+    logger.info("Creating Generator instance...")
+    generator = Generator(model)
+    logger.info("Generator instance created.")
+
+    # --- Apply Caching and Warmup ---
+    logger.info("Applying LRU cache patch to tokenizer.")
+    generator._tokenization_cache = {} # Ensure it exists (might be redundant)
+    from functools import lru_cache
+    original_tokenize_text = generator._tokenize_text_segment
+    @lru_cache(maxsize=2048)
+    def cached_tokenize_text_segment(text_str, speaker_int):
+        return original_tokenize_text(text_str, speaker_int)
+    generator._tokenize_text_segment = lambda text, speaker: cached_tokenize_text_segment(text, speaker)
+
+    logger.info("Performing generator warmup...")
+    warmup_generator(generator) # Assumes warmup_generator is defined elsewhere in the file
+
+    logger.info(f"CSM Model '{model_id}' loaded and generator ready.")
+    return generator
+
+def stream_audio_to_wav(filename, sample_rate):
+    """
+    Initialize a WAV writer for streaming audio chunks.
+    
+    Args:
+        filename: Output WAV file path
+        sample_rate: Audio sample rate in Hz
+    
+    Returns:
+        tuple: (write_chunk, close) functions for writing audio data and closing the file
+    """
+    # Create a WAV file with the proper header
+    wav_file = wave.open(filename, 'wb')
+    wav_file.setnchannels(1)  # Mono
+    wav_file.setsampwidth(2)  # 16-bit
+    wav_file.setframerate(sample_rate)
+    
+    def write_chunk(audio_chunk):
+        # Convert tensor to numpy and then to int16 PCM format
+        if isinstance(audio_chunk, torch.Tensor):
+            # Ensure it's on CPU and detached before converting to numpy
+            audio_np = audio_chunk.detach().cpu().numpy()
+        else:
+            audio_np = audio_chunk
+            
+        # Normalize if needed (assuming audio is in [-1, 1] range)
+        if audio_np.max() <= 1.0 and audio_np.min() >= -1.0:
+            audio_int = (audio_np * 32767).astype(np.int16)
+        else:
+            audio_int = audio_np.astype(np.int16)
+            
+        # Write to WAV file
+        wav_file.writeframes(audio_int.tobytes())
+    
+    def close():
+        wav_file.close()
+        
+    return write_chunk, close
+
+
+def generate_streaming_audio(
+    generator: Generator,
+    text: str,
+    speaker: int,
+    context: List[Segment],
+    output_file: str,
+    max_audio_length_ms: float = 90_000,
+    temperature: float = 0.8,
+    topk: int = 50,
+    play_audio: bool = False,
+):
+    """
+    Generate audio with streaming output and comprehensive timing metrics.
+    Optimized for reduced first-chunk latency.
+    """
+    # Initialize the streaming WAV writer
+    write_chunk, close_wav = stream_audio_to_wav(output_file, generator.sample_rate)
+    
+    # Set up audio playback if requested
+    audio_queue = queue.Queue(maxsize=100) if play_audio else None
+    stop_event = threading.Event()
+    
+    if play_audio:
+        try:
+            import sounddevice as sd
+            
+            # Get available sample rates for default output device to check compatibility
+            device_info = sd.query_devices(kind='output')
+            supported_rate = device_info.get('default_samplerate', 44100)
+            need_resampling = abs(supported_rate - generator.sample_rate) > 100
+            
+            if need_resampling:
+                try:
+                    # Use resampling if sample rate doesn't match
+                    import librosa
+                    print(f"Resampling from {generator.sample_rate}Hz to {int(supported_rate)}Hz for playback")
+                    
+                    def audio_playback_worker():
+                        while not stop_event.is_set() or not audio_queue.empty():
+                            try:
+                                chunk = audio_queue.get(timeout=0.5)
+                                audio_np = chunk.numpy() if isinstance(chunk, torch.Tensor) else chunk
+                                # Resample to device's supported rate
+                                resampled = librosa.resample(
+                                    audio_np, 
+                                    orig_sr=generator.sample_rate, 
+                                    target_sr=int(supported_rate)
+                                )
+                                sd.play(resampled, supported_rate, blocking=True)
+                                audio_queue.task_done()
+                            except queue.Empty:
+                                pass
+                            except Exception as e:
+                                print(f"Playback error: {e}")
+                except ImportError:
+                    print("Librosa not found. Using direct playback which may cause sample rate warnings.")
+                    need_resampling = False
+            
+            if not need_resampling:
+                def audio_playback_worker():
+                    while not stop_event.is_set() or not audio_queue.empty():
+                        try:
+                            chunk = audio_queue.get(timeout=0.5)
+                            audio_np = chunk.numpy() if isinstance(chunk, torch.Tensor) else chunk
+                            sd.play(audio_np, generator.sample_rate, blocking=True)
+                            audio_queue.task_done()
+                        except queue.Empty:
+                            pass
+                        except Exception as e:
+                            print(f"Playback error: {e}")
+            
+            # Start playback thread
+            playback_thread = threading.Thread(target=audio_playback_worker, daemon=True)
+            playback_thread.start()
+            
+        except ImportError:
+            print("sounddevice library not found. Install with 'pip install sounddevice' for real-time playback.")
+            play_audio = False
+    
+    # Timing metrics
+    chunk_times = []
+    latency_to_first_chunk = None
+    total_audio_duration = 0
+    chunk_count = 0
+    
+    # Function to handle each generated chunk
+    def on_chunk_generated(chunk):
+        nonlocal chunk_count, latency_to_first_chunk, total_audio_duration
+        
+        current_time = time.time()
+        if chunk_count == 0:
+            latency_to_first_chunk = current_time - start_time
+            print(f"First chunk latency: {latency_to_first_chunk*1000:.1f}ms")
+            
+        # Save chunk to WAV file
+        write_chunk(chunk)
+        
+        # Update metrics
+        chunk_count += 1
+        chunk_duration = len(chunk) / generator.sample_rate
+        total_audio_duration += chunk_duration
+        chunk_times.append(current_time)
+        
+        # Send to audio player if enabled
+        if play_audio and audio_queue is not None:
+            try:
+                audio_queue.put(chunk, timeout=0.1)
+            except queue.Full:
+                pass  # Skip if queue is full to avoid blocking
+    
+    if torch.cuda.is_available():
+        print("Preparing GPU for low-latency generation...")
+        torch.cuda.empty_cache()
+        torch.cuda.synchronize()
+        
+        # Pre-allocate some GPU memory to avoid allocation during generation
+        dummy_tensors = []
+        for i in range(5):
+            dummy = torch.ones((100, 100), device=generator.device)
+            dummy = dummy + 1.0  # Force computation
+            dummy_tensors.append(dummy)  # Keep reference to prevent deallocation
+            
+        torch.cuda.synchronize()
+    
+    # Set process priority to improve performance - use higher priority
+    try:
+        import psutil
+        process = psutil.Process()
+        if platform.system() == 'Windows':
+            process.nice(psutil.HIGH_PRIORITY_CLASS)
+        else:
+            # Use higher priority for Linux (-10 instead of 0)
+            process.nice(-1)  # -20 to 19, lower is higher priority
+    except (ImportError, PermissionError, psutil.AccessDenied):
+        pass
+    
+    print(f"Starting audio generation for: '{text[:50]}{'...' if len(text) > 50 else ''}'")
+    start_time = time.time()
+    
+    # Generate audio in chunks, catching possible errors
+    frame_count = 0
+    try:
+        for audio_chunk in generator.generate_stream(
+            text=text,
+            speaker=speaker,
+            context=context,
+            max_audio_length_ms=max_audio_length_ms,
+            temperature=temperature,
+            topk=topk,
+            on_chunk_generated=on_chunk_generated
+        ):
+            frame_count += 1
+            
+            # Print timing info less frequently to reduce overhead
+            if frame_count % 10 == 0:
+                current_time = time.time()
+                elapsed = current_time - start_time
+                if total_audio_duration > 0:
+                    rtf = elapsed / total_audio_duration
+                    remaining_time = (max_audio_length_ms/1000 - total_audio_duration) * rtf
+                    print(f"Chunk {chunk_count}: {total_audio_duration:.1f}s audio in {elapsed:.1f}s "
+                          f"(RTF: {rtf:.2f}x, Est. remaining: {remaining_time:.1f}s)")
+    except Exception as e:
+        print(f"Error during audio generation: {e}")
+        import traceback
+        traceback.print_exc()
+    
+    # Release dummy tensors to free memory
+    if 'dummy_tensors' in locals():
+        del dummy_tensors
+    
+    # Signal audio worker that generation is complete
+    stop_event.set()
+    
+    # Close WAV file
+    close_wav()
+    
+    # Wait for audio playback to complete if enabled
+    if play_audio and 'playback_thread' in locals():
+        print("Waiting for audio playback to complete...")
+        playback_thread.join(timeout=5.0)
+    
+    # Calculate and print detailed performance metrics
+    end_time = time.time()
+    total_elapsed = end_time - start_time
+    
+    # Calculate inter-chunk latency
+    if len(chunk_times) > 1:
+        inter_chunk_latencies = [chunk_times[i] - chunk_times[i-1] for i in range(1, len(chunk_times))]
+        avg_inter_chunk_latency = sum(inter_chunk_latencies) / len(inter_chunk_latencies)
+        max_inter_chunk_latency = max(inter_chunk_latencies) if inter_chunk_latencies else 0
+        min_inter_chunk_latency = min(inter_chunk_latencies) if inter_chunk_latencies else 0
+    else:
+        avg_inter_chunk_latency = max_inter_chunk_latency = min_inter_chunk_latency = 0
+    
+    rtf = total_elapsed / total_audio_duration if total_audio_duration > 0 else float('inf')
+    
+    print("\n" + "="*50)
+    print("AUDIO GENERATION PERFORMANCE METRICS")
+    print("="*50)
+    print(f"First chunk latency: {latency_to_first_chunk*1000:.1f}ms")
+    print(f"Total generation time: {total_elapsed:.2f}s")
+    print(f"Audio duration: {total_audio_duration:.2f}s")
+    print(f"Real-time factor (RTF): {rtf:.3f}x (target: <1.0)")
+    print(f"Number of chunks: {chunk_count}")
+    print(f"Average chunk size: {(total_audio_duration/chunk_count)*1000:.1f}ms") if chunk_count > 0 else None
+    print(f"Average inter-chunk latency: {avg_inter_chunk_latency*1000:.1f}ms")
+    print(f"Min/Max inter-chunk latency: {min_inter_chunk_latency*1000:.1f}ms / {max_inter_chunk_latency*1000:.1f}ms")
+    print(f"Chunks per second: {chunk_count/total_elapsed:.2f}")
+    print(f"Output file: {output_file}")
+    print("="*50)
