@@ -243,10 +243,22 @@ Look into:
 ➔ Enable "dynamic shapes" in torch.compile
 🔥 What it does:
 Tells PyTorch to optimize even when input sizes vary (which they do in TTS – different text lengths = different audio durations).
-
 Without it, torch.compile can be a little conservative (less aggressive optimizations).
-
 With it, performance can improve another 5–15%, sometimes even more.
 
-
 Look into raising the temp of the TTS, could speed up generation
+
+Aggressive Torch Compilation (with Optimization Flags)
+Right now you enabled torch.compile(), but you can pass a backend like max-autotune.
+Example:
+model = torch.compile(model, backend="max-autotune")
+This often gives another 20–30% faster inference over plain compile.
+Downside: Slightly longer first-time startup (model warmup).
+
+Force Simpler TTS Sampling (temperature + beam width)
+Lower beam width or raise temperature slightly:
+Reduces the model’s need to search for "perfect" sounding samples.
+Can shave off about 10–15% more latency.
+Example tweak:
+TTS sampling temperature: 0.75 → 0.85
+Beam width: if using >1, lower it to 1.
