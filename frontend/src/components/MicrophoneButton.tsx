@@ -1,5 +1,5 @@
 // frontend/src/components/MicrophoneButton.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useAppStore, AppState } from '../lib/store';
 import {
@@ -29,13 +29,18 @@ export const MicrophoneButton: React.FC = () => {
   } = useAppStore();
 
   const [ttsWebSocket, setTtsWebSocket] = useState<WebSocket | null>(null);
+  
+  // Add a ref to track the current utterance ID
+  const currentUtteranceIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // This effect runs on unmount or when ttsWebSocket changes
     return () => {
-      console.log('MicrophoneButton unmount: cleaning up resources.');
-      ttsWebSocket?.close();
-      stopMediaStream();
-      cleanupAudio();
+      console.log('MicrophoneButton unmount or ttsWebSocket change: closing WebSocket only');
+      if (ttsWebSocket && ttsWebSocket.readyState === WebSocket.OPEN) {
+        ttsWebSocket.close();
+      }
+      // Don't call cleanupAudio() here - let audio playback finish naturally
     };
   }, [ttsWebSocket]);
 
@@ -46,33 +51,51 @@ export const MicrophoneButton: React.FC = () => {
       return;
     }
 
+    // Always clean up previous audio context before starting a new one
     cleanupAudio();
 
-    if (ttsWebSocket) {
+    // Close previous WebSocket if it exists
+    if (ttsWebSocket && ttsWebSocket.readyState === WebSocket.OPEN) {
       ttsWebSocket.close();
       setTtsWebSocket(null);
     }
 
     const utteranceId = uuidv4();
+    currentUtteranceIdRef.current = utteranceId;
+    
+    // Create and configure the new WebSocket
     const socket = createTTSWebSocket(
       utteranceId,
       text,
-      (audioChunk) => handleIncomingAudioChunk(audioChunk),
+      (audioChunk) => {
+        // Only process chunks if this is still the active utterance
+        if (currentUtteranceIdRef.current === utteranceId) {
+          handleIncomingAudioChunk(audioChunk);
+        }
+      },
       () => {
+        // Server sent "stream_end" - close THIS SPECIFIC WebSocket immediately
         console.log(`Streaming ended for utterance: ${utteranceId}`);
-        setTimeout(() => {
+        if (currentUtteranceIdRef.current === utteranceId && socket.readyState === WebSocket.OPEN) {
+          // Use the direct socket reference, not the possibly stale ttsWebSocket state
+          socket.close();
           setTtsWebSocket(null);
-          setAppState(AppState.IDLE);
-          console.log('Playback finished. Now idle.');
-        }, 500); // 500ms buffer to let the final audio finish playing
-      }
-      ,
+          // Note: Do NOT setAppState(AppState.IDLE) here
+          // This will be handled by the AudioContext's onended handler
+        }
+      },
       (error) => {
         console.error(`TTS stream error:`, error);
         setError(`TTS streaming error.`);
-        cleanupAudio();
-        setTtsWebSocket(null);
-        setAppState(AppState.IDLE);
+        if (currentUtteranceIdRef.current === utteranceId) {
+          currentUtteranceIdRef.current = null;
+          if (socket.readyState === WebSocket.OPEN) {
+            socket.close();
+          }
+          setTtsWebSocket(null);
+          cleanupAudio();
+          setAppState(AppState.IDLE);
+        }
       }
     );
 
@@ -83,10 +106,20 @@ export const MicrophoneButton: React.FC = () => {
   const toggleRecording = async () => {
     setErrorMessage('');
 
-    if (ttsWebSocket) {
-      ttsWebSocket.close();
-      setTtsWebSocket(null);
-      cleanupAudio();
+    // If speaking, stop the current speech
+    if (appState === AppState.SPEAKING) {
+      console.log('Stopping speech...');
+      currentUtteranceIdRef.current = null;
+      
+      if (ttsWebSocket && ttsWebSocket.readyState === WebSocket.OPEN) {
+        ttsWebSocket.close();
+        setTtsWebSocket(null);
+      }
+      
+      // Don't stop the media stream here, only clean up audio
+      cleanupAudio(); // This will properly clean up the audio
+      setAppState(AppState.IDLE);
+      return;
     }
 
     if (isRecording) {
@@ -120,12 +153,19 @@ export const MicrophoneButton: React.FC = () => {
 
   const handleReset = async () => {
     console.log('Resetting conversation...');
+    
+    // Reset all flags
+    currentUtteranceIdRef.current = null;
+    
+    // Correct order: stop media stream first, then clean up audio
     stopMediaStream();
     cleanupAudio();
-    if (ttsWebSocket) {
+    
+    if (ttsWebSocket && ttsWebSocket.readyState === WebSocket.OPEN) {
       ttsWebSocket.close();
       setTtsWebSocket(null);
     }
+    
     resetConversationState();
     await resetBackendHistory();
     setAppState(AppState.IDLE);
