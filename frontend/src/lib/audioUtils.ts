@@ -1,3 +1,4 @@
+// frontend\src\lib\audioUtils.ts
 import { useAppStore, AppState } from './store';
 
 let mediaRecorder: MediaRecorder | null = null;
@@ -124,6 +125,10 @@ function getSupportedMimeTypeOptions(): MediaRecorderOptions {
 
 // === Streaming Playback Functions ===
 
+export function isAudioPlaybackActive(): boolean {
+  return isPlayingStream && audioQueue.length > 0;
+}
+
 function getAudioContext(): AudioContext | null {
   if (!audioCtx || audioCtx.state === "closed") {
     audioCtx = new AudioContext();
@@ -146,6 +151,7 @@ export async function handleIncomingAudioChunk(chunkBytes: Uint8Array) {
     }
 
     audioQueue.push(decodedBuffer);
+    console.log(`Added chunk to queue. Queue length: ${audioQueue.length}, chunk duration: ${decodedBuffer.duration.toFixed(2)}s`);
 
     if (!isPlayingStream && totalBufferedSeconds() >= PLAYBACK_START_BUFFER_SECONDS) {
       playNextChunkFromQueue();
@@ -169,6 +175,7 @@ function playNextChunkFromQueue() {
     isPlayingStream = true;
     setAppState(AppState.SPEAKING);
     scheduledEndTime = ctx.currentTime;
+    console.log('Started audio playback stream');
   }
 
   const bufferToPlay = audioQueue[0];
@@ -180,19 +187,36 @@ function playNextChunkFromQueue() {
 
   source.onended = () => {
     audioQueue.shift();
+    console.log(`Buffer finished playing. Remaining buffers: ${audioQueue.length}`);
+    
     if (audioQueue.length > 0) {
+      // If there are more buffers, continue playing
       playNextChunkFromQueue();
     } else {
+      // This is truly the end of playback - now we can clean up
+      console.log('All buffers done—closing AudioContext');
       isPlayingStream = false;
+      
+      // This is the ONLY place we set IDLE after playback
       setAppState(AppState.IDLE);
+      
+      // Clean up audio context now that playback is truly complete
+      if (audioCtx && audioCtx.state !== 'closed') {
+        audioCtx.close().catch((e) => console.warn("Error closing AudioContext:", e));
+        audioCtx = null;
+      }
     }
   };
 
   source.start(startTime);
   scheduledEndTime = startTime + bufferToPlay.duration;
+  
+  // Log remaining audio length for debugging
+  console.log(`Playing buffer: ${bufferToPlay.duration.toFixed(2)}s, remaining buffers: ${audioQueue.length-1}, total scheduled time: ${(scheduledEndTime - ctx.currentTime).toFixed(2)}s`);
 }
 
 export function cleanupAudio() {
+  console.log(`Cleaning up audio. Queue length before cleanup: ${audioQueue?.length || 0}`);
   audioQueue = [];
   if (audioCtx) {
     if (audioCtx.state !== 'closed') {
@@ -202,7 +226,7 @@ export function cleanupAudio() {
   }
   isPlayingStream = false;
   scheduledEndTime = 0;
-  if (useAppStore.getState().appState === AppState.SPEAKING) {
-    setAppState(AppState.IDLE);
-  }
+  
+  // REMOVED setAppState(AppState.IDLE) from here 
+  // to have a single source of truth for state transitions
 }
