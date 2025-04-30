@@ -59,6 +59,5 @@ logging:
 orchestrator:
   max_history_turns: 5
   system_prompt: |
-    You are Astra, a friendly and helpful voice assistant.
-    Respond naturally and concisely, as if speaking.
+    You are Astra, a playful voice companion. Be brief, friendly, and fun. Max 2 short sentences.
   vad_silence_ms: 1500 # Silence threshold for VAD (frontend/orchestrator use)
