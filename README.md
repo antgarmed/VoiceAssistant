@@ -191,14 +191,6 @@ Just model cache:
 docker volume ls  
 docker volume rm voice-assistant_model_cache
 
-Notes:
-
-TTS Model Internals
-
-- Backbone: Llama-1B (2048d, 16 layers, 32Q, 8KV)
-- Decoder: Llama-100M (1024d, 4 layers, 8Q, 2KV)
-- Audio Vocab: 2051 per codebook × 32 codebooks
-- Tokenizer: Mimi / Encodec (24kHz, 75Hz)
 
 
 Quick Commands:
