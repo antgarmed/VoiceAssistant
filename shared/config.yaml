@@ -4,11 +4,11 @@
 asr:
   # faster-whisper settings
   # Model will be downloaded to CACHE_DIR if not present
-  model_name: "large-v3"        # HF Hub identifier (e.g., "large-v3", "distil-large-v3", "base.en")
+  model_name: "distil-whisper/distil-large-v3.5-ct2"        # HF Hub identifier (e.g., "large-v3", "distil-large-v3", "base.en")
   compute_type: "int8_float16"  # Performance/VRAM trade-off ("float16", "int8")
   device: "auto"                # "cuda", "cpu", "auto"
   # Transcription parameters
-  beam_size: 5
+  beam_size: 3
   language: "en"                # Set null for auto-detect, 'en' for English-only
   vad_filter: true              # Enable Voice Activity Detection
   vad_parameters:               # Tune VAD sensitivity
