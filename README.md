@@ -45,6 +45,7 @@ A high-performance, local voice assistant with real-time transcription, LLM reas
    - Start: `npm run tauri dev`
 
 ## Usage
+- Build backend: `docker compose build`
 - Start backend: `docker compose up -d`
 - Start frontend: `cd frontend && npm run tauri dev`
 - View logs: `docker compose logs -f`
