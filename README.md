@@ -1,10 +1,10 @@
 # Sesame CSM Voice Assistant
 
 ## Overview
-A high-performance, local voice assistant with real-time transcription, LLM reasoning, and text-to-speech. Built with Tauri 2.x and React, runs fully offline after setup. Features Sesame CSM for expressive speech synthesis. Real-time factor: 0.6x with NVIDIA 4070 Ti Super.
+A high-performance, local voice assistant with real-time transcription, LLM reasoning, and text-to-speech. Runs fully offline after setup and features Sesame CSM for expressive speech synthesis. Real-time factor: 0.6x with NVIDIA 4070 Ti Super.
 
 ## Features
-- Real-time Speech-to-Text using `faster-whisper`
+- Real-time Speech-to-Text using `distil-whisper`
 - On-device LLM using Llama 3.2 1B 
 - Natural TTS via Sesame CSM (`senstella/csm-expressiva-1b`)
 - Desktop GUI with Tauri/React
