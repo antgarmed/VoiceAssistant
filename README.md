@@ -1,42 +1,60 @@
-```
-# A functioning Sesame CSM project - Real-time factor: 0.6x with 4070 Ti Super
+# Sesame CSM Voice Assistant
 
-TLDR Setup:
-Install and run docker desktop
-Request access to Llama 3.2 1b and acquire huggingface key (then replace in .env file)
-Install dependencies (rust, Tauri, Nvidia Container Toolkit)
-Build backend (docker compose build) then run (docker compose up -d), then from the frontend directory, build frontend (npm install & npm install uuid) then start frontend (npm run tauri dev)
+## Overview
+A high-performance, local voice assistant with real-time transcription, LLM reasoning, and text-to-speech. Built with Tauri 2.x and React, runs fully offline after setup. Features Sesame CSM for expressive speech synthesis. Real-time factor: 0.6x with NVIDIA 4070 Ti Super.
 
-This project provides a high-performance, local voice assistant featuring real-time transcription, LLM reasoning, text-to-speech, and a cross-platform GUI built with **Tauri 2.x** and **React**. It runs fully offline after setup, ensuring privacy, speed, and GPU acceleration. It features the new **Sesame CSM** model for expressive, local speech synthesis.
+## Features
+- Real-time Speech-to-Text using `faster-whisper`
+- On-device LLM using Llama 3.2 1B 
+- Natural TTS via Sesame CSM (`senstella/csm-expressiva-1b`)
+- Desktop GUI with Tauri/React
+- Conversation history and speaking animations
+- GPU acceleration with CUDA
+- Modular Docker-based backend
 
-Features
+## Tech Stack
+- **Frontend**: Tauri 2.5.1, React 18+, TypeScript
+- **Backend**: Python 3.10, FastAPI, Uvicorn
+- **Models**: `faster-whisper` (large-v3), Llama 3.2 1B (GGUF), Sesame CSM
 
-- Real-time Speech-to-Text (ASR): Fast transcription using `faster-whisper`
-- Large Language Model (LLM): On-device response generation using Llama 3.2 1B
-- Natural Text-to-Speech (TTS): output via Sesame CSM fine-tune `senstella/csm-expressiva-1b`
-- Desktop GUI: Built with Tauri and React
-- Speaking Animations: Visual feedback when speaking
-- Conversation History: Remembers context from recent turns
-- GPU Acceleration: Uses CUDA for speed and performance
-- Modular Backend: ASR, LLM, TTS, and orchestrator in Docker containers
-- Auto Model Downloads: Models downloaded at first launch from Hugging Face
-- Real-time factor: 0.6x with 4070 Ti Super
+## Requirements
+- NVIDIA GPU: 8GB+ VRAM
+- 32GB RAM
+- Docker Desktop
+- NVIDIA GPU Drivers (CUDA 12.1+)
+- NVIDIA Container Toolkit
+- Node.js & npm (v18+)
+- Rust & Cargo
+- Hugging Face access to Llama 3.2 1B
 
-Tech Stack
+## Setup
+1. **Prerequisites**:
+   - Install Docker Desktop and ensure it's running
+   - Install Rust, Tauri, and NVIDIA Container Toolkit
+   - Request access to Llama 3.2 1B on Hugging Face
 
-- Frontend: Tauri 2.5.1, React 18+, TypeScript, Zustand, Vite
-- Backend: Python 3.10, FastAPI, Uvicorn
-- ASR: `faster-whisper` (large-v3)
-- LLM: Llama 3.2 1B (Q4_K_M via GGUF)
-- TTS: Sesame CSM fine-tune (`senstella/csm-expressiva-1b`)
-- Containerization: Docker, Docker Compose
-- Model Hub: Hugging Face (`huggingface_hub`)
+2. **Configuration**:
+   - Edit `.env` file and set `HUGGING_FACE_TOKEN=hf_yourTokenHere`
 
-Project Structure
+3. **Backend**:
+   - Build: `docker compose build`
+   - Run: `docker compose up -d`
 
-C:\Users\maste\Desktop\voice-assistant\
+4. **Frontend**:
+   - Install dependencies: `cd frontend && npm install && npm install uuid`
+   - Start: `npm run tauri dev`
+
+## Usage
+- Start backend: `docker compose up -d`
+- Start frontend: `cd frontend && npm run tauri dev`
+- View logs: `docker compose logs -f`
+- Stop: `docker compose down`
+
+
+
+## Project Structure
+
 ├── .env
-├── .env.example
 ├── docker-compose.yml
 ├── README.md
 │
@@ -111,89 +129,10 @@ C:\Users\maste\Desktop\voice-assistant\
 │   ├── logs\
 │   └── models\
 
-Prerequisites
-
-- Docker & Docker Compose: https://docs.docker.com/get-docker/
-- NVIDIA GPU Drivers (CUDA 12.1+): https://www.nvidia.com/Download/index.aspx
-- NVIDIA Container Toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html  
-  Verify:
-  docker run --rm --gpus all nvidia/cuda:12.1.1-base-ubuntu22.04 nvidia-smi
-- Node.js & npm (v18+): https://nodejs.org/
-- Rust & Cargo: https://www.rust-lang.org/tools/install
-- Tauri CLI & dependencies: https://tauri.app/v1/guides/getting-started/prerequisites or cargo install tauri-cli
-
-Min specs:
-GPU: Nvidia with 8GB+ VRAM
-RAM: 32 GB RAM
-OS: Windows or Linux
-
-Docker Desktop must be installed and running
-Llama 3.2 1b is a gated repo, you must request and be given access to acquire it from huggingface
-
-You will need these if you don't have them already:
-npm install
-cargo install tauri-cli
-npm install uuid
-
-TLDR Setup:
-Install and run docker
-Request access to Llama 3.2 1b and acquire huggingface key (then replace in .env file)
-Install dependencies (rust, Tauri, Nvidia Container Toolkit)
-Build backend then run, start frontend 
-
-Setup
-
-Configure: 
-Edit `.env` and change:
-HUGGING_FACE_TOKEN=hf_yourTokenHere
-
-Install Frontend:
-cd frontend  
-npm install  
-cd ..
-
-Build Backend:
-docker compose build  
-# Optional: rebuild TTS only
-docker compose build --no-cache tts
-
-Run the App
-
-Start Backend:
-docker compose up -d  
-Check with:
-docker compose ps
-
-Start Frontend:
-cd frontend  
-npm run tauri dev
-
-Stop the App
-
-Close the frontend window or press Ctrl+C  
-Stop backend:
-docker compose down
-
-Logs
-
-All:
-docker compose logs -f
-
-One service:
-docker compose logs -f tts
-
-Cleanup (Optional)
-
-Remove all:
-docker compose down -v
-
-Just model cache:
-docker volume ls  
-docker volume rm voice-assistant_model_cache
 
 
+## Quick Commands
 
-Quick Commands:
 
 docker compose down -v
 docker compose build --no-cache tts
