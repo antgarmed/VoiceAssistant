@@ -15,7 +15,7 @@ A high-performance, local voice assistant with real-time transcription, LLM reas
 ## Tech Stack
 - **Frontend**: Tauri 2.5.1, React 18+, TypeScript
 - **Backend**: Python 3.10, FastAPI, Uvicorn
-- **Models**: `faster-whisper` (large-v3), Llama 3.2 1B (GGUF), Sesame CSM
+- **Models**: `distil-whisper` (large-v3.5), Llama 3.2 1B (GGUF), Sesame CSM
 
 ## Requirements
 - NVIDIA GPU: 8GB+ VRAM
@@ -49,7 +49,6 @@ A high-performance, local voice assistant with real-time transcription, LLM reas
 - Start frontend: `cd frontend && npm run tauri dev`
 - View logs: `docker compose logs -f`
 - Stop: `docker compose down`
-
 
 
 ## Project Structure
