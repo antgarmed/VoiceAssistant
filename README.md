@@ -48,7 +48,7 @@ A high-performance, local voice assistant with real-time transcription, LLM reas
 - Add your huggingface token and request access to the models (need to add links)
 - Build backend: `docker compose build`
 - Start backend: `docker compose up -d`
-- Build frontend: `npm install`
+- Build frontend: `npm install && npm install uuid`
 - Start frontend: `cd frontend && npm run tauri dev`
 - View logs: `docker compose logs -f`
 - Stop: `docker compose down`
